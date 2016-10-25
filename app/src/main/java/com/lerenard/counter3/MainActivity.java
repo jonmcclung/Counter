@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,10 +16,16 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    static final int NEW_COUNT = 0,
+            UPDATE_COUNT = 1;
+
+    private CountAdapter adapter;
 
     public void gotoCounter(View view) {
 
@@ -31,27 +38,33 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), CounterActivity.class);
-                System.out.println("about to start an activity");
-                startActivity(intent);
+                startActivityForResult(intent, NEW_COUNT);
             }
         });
 
         ListView list = (ListView) findViewById(R.id.list);
+        list.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    fab.setVisibility(View.INVISIBLE);
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    fab.setVisibility(View.VISIBLE);
+                }
+                return false;
+            }
+        });
+
         Context context = getApplicationContext();
-        List<Count> countArray = Arrays.asList(
-                new Count("one", 1), new Count("two", 3),
-                new Count("four", 4), new Count("three", 5),
-                new Count("one", 1), new Count("two", 3),
-                new Count("four", 4), new Count("three", 5),
-                new Count("one", 1), new Count("two", 3),
-                new Count("four", 4), new Count("three", 5)
-        );
-        ArrayAdapter<Count> adapter = new CountAdapter(this, R.layout.list_view_item, countArray);
+        List<Count> countArray = new ArrayList<>();
+        countArray.add(new Count("one", 1));
+        adapter = new CountAdapter(this, R.layout.list_view_item, countArray);
         list.setAdapter(adapter);
 
     }
@@ -72,9 +85,33 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+
+            if (requestCode == NEW_COUNT || requestCode == UPDATE_COUNT) {
+                Bundle extras = data.getExtras();
+                if (extras == null) {
+                    throw new IllegalArgumentException("Intent passed RESULT_OK but empty intent.");
+                }
+                Count count = (Count) extras.getSerializable("count");
+                if (requestCode == NEW_COUNT) {
+                    adapter.add(count);
+                } else /*if (requestCode == UPDATE_COUNT)*/ {
+                    int index = extras.getInt("index");
+                    adapter.remove(index);
+                    adapter.insert(count, index);
+                }
+            } else {
+                throw new IllegalArgumentException("unexpected requestCode " + Integer.toString(requestCode));
+            }
+        }
     }
 }

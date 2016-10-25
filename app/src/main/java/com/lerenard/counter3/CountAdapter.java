@@ -1,15 +1,16 @@
 package com.lerenard.counter3;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +19,10 @@ import java.util.List;
 
 
 public class CountAdapter extends ArrayAdapter<Count> {
+
+    public void remove(int index) {
+        list.remove(index);
+    }
 
     static class ViewHolder {
         public TextView name;
@@ -34,7 +39,7 @@ public class CountAdapter extends ArrayAdapter<Count> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         final Count count = list.get(position);
         View view;
         ViewHolder holder;
@@ -49,12 +54,12 @@ public class CountAdapter extends ArrayAdapter<Count> {
                 public void onClick(View view) {
                     Intent intent = new Intent(context, CounterActivity.class);
                     intent.putExtra("count", count);
-                    context.startActivity(intent);
+                    intent.putExtra("index", position);
+                    ((Activity) context).startActivityForResult(intent, MainActivity.UPDATE_COUNT);
                 }
             });
             view.setTag(holder);
-        }
-        else {
+        } else {
             view = convertView;
             holder = (ViewHolder) convertView.getTag();
         }

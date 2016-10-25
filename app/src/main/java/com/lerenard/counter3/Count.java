@@ -34,5 +34,7 @@ public class Count implements Serializable {
         this(n, 0);
     }
 
+    Count() {this("");}
+
 
 }
