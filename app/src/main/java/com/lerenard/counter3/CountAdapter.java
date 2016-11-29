@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +13,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by lerenard on 16-Aug-16.
  */
 
 
-public class CountAdapter extends ArrayAdapter<Count> {
+public class CountAdapter extends ArrayAdapter<Count> implements Serializable, Parcelable {
 
     public void remove(int index) {
         list.remove(index);
@@ -31,6 +35,28 @@ public class CountAdapter extends ArrayAdapter<Count> {
         list.add(index, count);
     }
 
+    public static final Creator<CountAdapter> CREATOR = new Creator<CountAdapter>() {
+        @Override
+        public CountAdapter createFromParcel(Parcel in) {
+            return new CountAdapter(in);
+        }
+
+        @Override
+        public CountAdapter[] newArray(int size) {
+            return new CountAdapter[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeSerializable(this);
+    }
+
     static class ViewHolder {
         public TextView name;
         public TextView amount;
@@ -38,11 +64,21 @@ public class CountAdapter extends ArrayAdapter<Count> {
 
     private Context context;
     private List<Count> list;
+    private int resource;
 
     public CountAdapter(Context context, int resource, List<Count> list) {
         super(context, resource, list);
         this.context = context;
+        this.resource = resource;
         this.list = list;
+    }
+
+    public CountAdapter(CountAdapter countAdapter) {
+        this(countAdapter.context, countAdapter.resource, countAdapter.list);
+    }
+
+    protected CountAdapter(Parcel in) {
+        this((CountAdapter) in.readSerializable());
     }
 
     @Override
@@ -72,8 +108,7 @@ public class CountAdapter extends ArrayAdapter<Count> {
         }
 
         holder.name.setText(count.getName());
-        holder.amount.setText(Integer.toString(count.getCount()));
-        //holder.amount.setText("0");
+        holder.amount.setText(String.format(Locale.getDefault(), "%d", count.getCount()));
 
         return view;
     }
