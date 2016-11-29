@@ -141,9 +141,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             if (!super.onMenuItemSelected(featureId, item)) {
                 NavUtils.navigateUpFromSameTask(this);
             }
+            this.finish();
             return true;
         }
         return super.onMenuItemSelected(featureId, item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.finish();
+        super.onBackPressed();
     }
 
     /**

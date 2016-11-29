@@ -102,13 +102,15 @@ public class MainActivity extends AppCompatActivity {
                     throw new IllegalArgumentException("Intent passed RESULT_OK but empty intent.");
                 }
                 Count count = (Count) extras.getSerializable("count");
+                assert count != null;
+                Snackbar.make(findViewById(R.id.main_layout), count.toString(), Snackbar.LENGTH_LONG).show();
                 if (requestCode == NEW_COUNT) {
                     adapter.add(count);
                 } else /*if (requestCode == UPDATE_COUNT)*/ {
                     int index = extras.getInt("index");
-                    adapter.remove(index);
-                    adapter.insert(count, index);
+                    adapter.set(index, count);
                 }
+                adapter.notifyDataSetChanged();
             } else {
                 throw new IllegalArgumentException("unexpected requestCode " + Integer.toString(requestCode));
             }

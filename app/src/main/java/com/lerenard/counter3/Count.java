@@ -36,5 +36,8 @@ public class Count implements Serializable {
 
     Count() {this("");}
 
+    public String toString() {
+        return "[Count, name: " + name + ", count: " + count + "]";
+    }
 
 }

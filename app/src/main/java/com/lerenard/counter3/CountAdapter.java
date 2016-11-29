@@ -23,6 +23,13 @@ public class CountAdapter extends ArrayAdapter<Count> {
     public void remove(int index) {
         list.remove(index);
     }
+    public void set(int index, Count count) {
+        list.set(index, count);
+    }
+
+    public void insert(int index, Count count) {
+        list.add(index, count);
+    }
 
     static class ViewHolder {
         public TextView name;
@@ -40,7 +47,7 @@ public class CountAdapter extends ArrayAdapter<Count> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        final Count count = list.get(position);
+        Count count = list.get(position);
         View view;
         ViewHolder holder;
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(MainActivity.LAYOUT_INFLATER_SERVICE);
@@ -53,7 +60,7 @@ public class CountAdapter extends ArrayAdapter<Count> {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(context, CounterActivity.class);
-                    intent.putExtra("count", count);
+                    intent.putExtra("count", list.get(position));
                     intent.putExtra("index", position);
                     ((Activity) context).startActivityForResult(intent, MainActivity.UPDATE_COUNT);
                 }
