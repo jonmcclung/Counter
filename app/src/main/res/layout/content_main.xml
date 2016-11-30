@@ -9,13 +9,13 @@
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
-    <TextView
+    <!--<TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/title"
         android:id="@+id/title"
         android:textSize="@dimen/text_size"
-        />
+        />-->
     <ListView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
