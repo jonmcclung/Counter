@@ -1,9 +1,8 @@
 package com.lerenard.counter3;
 
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,8 +12,6 @@ import java.util.Locale;
 
 public class CounterActivity extends AppCompatActivity {
 
-    private Count count;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,13 +20,15 @@ public class CounterActivity extends AppCompatActivity {
         final EditText titleView = (EditText) findViewById(R.id.counter_title);
         final TextView countDisplayView = (TextView) findViewById(R.id.count_display);
         final int index;
+        Count count;
         if (extras != null) {
-            count = (Count) extras.getSerializable("count");
+            count = (Count) extras.getParcelable("count");
             index = extras.getInt("index", -1);
         } else {
             count = new Count();
             index = -1;
         }
+        assert count != null;
 
         titleView.setText(count.getName());
         countDisplayView.setText(String.format(Locale.getDefault(), "%d", count.getCount()));
@@ -38,7 +37,11 @@ public class CounterActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                ((TextView) v).setText(Integer.toString(1 + Integer.parseInt(String.valueOf(((TextView) v).getText()))));
+                ((TextView) v).setText(String.format(
+                        Locale.getDefault(),
+                        "%d",
+                        1 + Integer.parseInt(
+                                String.valueOf(((TextView) v).getText()))));
             }
         });
 
@@ -54,10 +57,12 @@ public class CounterActivity extends AppCompatActivity {
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                count.setCount(Integer.parseInt(String.valueOf(countDisplayView.getText())));
-                count.setName(String.valueOf(titleView.getText()));
                 Intent data = new Intent();
-                data.putExtra("count", count);
+                data.putExtra(
+                        "count",
+                        new Count(
+                                String.valueOf(titleView.getText()),
+                                Integer.parseInt(String.valueOf(countDisplayView.getText()))));
                 if (index != -1) {
                     data.putExtra("index", index);
                 }
