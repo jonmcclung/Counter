@@ -74,4 +74,8 @@
     <string name="help_title">Help</string>
     <string name="help_message">Tap on the number to increment it by one, and don\'t forget to save your changes when you\'re done.</string>
     <string name="ok">OK</string>
+
+    <!-- miscellaneous -->
+
+    <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
 </resources>

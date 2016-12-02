@@ -64,9 +64,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setLayoutManager(
                 new LinearLayoutManager(
-                        getApplicationContext(),
+                        this,
                         LinearLayoutManager.VERTICAL,
                         false));
+        if (BuildConfig.DEBUG && !recyclerView.getLayoutManager().canScrollVertically()) {
+            throw new AssertionError();
+        }
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
 
         Context context = getApplicationContext();
         if (true) {

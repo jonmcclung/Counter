@@ -5,12 +5,14 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
  * Taken from http://stackoverflow.com/a/32454407/4714742
  */
 public final class FlingBehavior extends AppBarLayout.Behavior {
+    private static final String TAG = "FlingBehavior";
     private static final int TOP_CHILD_FLING_THRESHOLD = 3;
     private boolean isPositive;
 
@@ -23,6 +25,10 @@ public final class FlingBehavior extends AppBarLayout.Behavior {
 
     @Override
     public boolean onNestedFling(CoordinatorLayout coordinatorLayout, AppBarLayout child, View target, float velocityX, float velocityY, boolean consumed) {
+        Log.d(
+                TAG,
+                coordinatorLayout.toString() + ", " + child.toString() + ", " + target.toString() +
+                        ", " + velocityX + ", " + velocityY);
         if (velocityY > 0 && !isPositive || velocityY < 0 && isPositive) {
             velocityY = velocityY * -1;
         }
