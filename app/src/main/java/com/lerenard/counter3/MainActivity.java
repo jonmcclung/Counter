@@ -3,6 +3,7 @@ package com.lerenard.counter3;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -28,11 +29,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String
             KEY_LIST_VIEW_STATE = "KEY_LIST_VIEW_STATE";
     public static final String
-            TAG = "_com.lerenard.counter3",
+            TAG = "__MainActivity",
             INTENT_EXTRA_COUNT = "INTENT_EXTRA_COUNT",
             INTENT_EXTRA_INDEX = "INTENT_EXTRA_INDEX";
 
     private RecyclerView recyclerView;
+    private Parcelable recyclerViewState;
     private CountRecyclerAdapter adapter;
 
     private Consumer<Integer> update = new Consumer<Integer>() {
