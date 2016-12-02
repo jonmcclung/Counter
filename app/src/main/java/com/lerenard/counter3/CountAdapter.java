@@ -54,7 +54,7 @@ public class CountAdapter extends StateSavingArrayAdapter<Count> {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(context, CounterActivity.class);
+                Intent intent = new Intent(context, CounterActivity.class);
                     intent.putExtra("count", getItem(position));
                     intent.putExtra("index", position);
                     ((Activity) context).startActivityForResult(intent, MainActivity.UPDATE_COUNT);

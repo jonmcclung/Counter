@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.ListView;
 
 /**
- * Created by mc on 30-Nov-16.
+ * This class automatically hides the fab when the user scrolls down, and shows it when they stop scrolling.
  */
 public class DisappearingFabBehavior extends FloatingActionButton.Behavior {
 

@@ -59,7 +59,7 @@ public class Count implements Parcelable {
     Count() {this("");}
 
     public String toString() {
-        return "<Count, name: " + name + ", count: " + count + ">";
+        return "<Count(\"" + name + "\", " + count + ")>";
     }
 
     @Override

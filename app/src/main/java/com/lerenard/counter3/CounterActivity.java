@@ -24,8 +24,8 @@ public class CounterActivity extends AppCompatActivity {
         final int index;
         Count count;
         if (extras != null) {
-            count = (Count) extras.getParcelable("count");
-            index = extras.getInt("index", -1);
+            count = (Count) extras.getParcelable(MainActivity.INTENT_EXTRA_COUNT);
+            index = extras.getInt(MainActivity.INTENT_EXTRA_INDEX, -1);
         } else {
             count = new Count();
             index = -1;
@@ -61,12 +61,12 @@ public class CounterActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent data = new Intent();
                 data.putExtra(
-                        "count",
+                        MainActivity.INTENT_EXTRA_COUNT,
                         new Count(
                                 String.valueOf(titleView.getText()),
                                 Integer.parseInt(String.valueOf(countDisplayView.getText()))));
                 if (index != -1) {
-                    data.putExtra("index", index);
+                    data.putExtra(MainActivity.INTENT_EXTRA_INDEX, index);
                 }
                 setResult(RESULT_OK, data);
                 finish();
