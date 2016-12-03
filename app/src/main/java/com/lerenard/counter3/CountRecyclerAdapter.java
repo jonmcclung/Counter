@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.lerenard.counter3.util.Consumer;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Observable;
@@ -18,7 +20,7 @@ import java.util.Observable;
  */
 public class CountRecyclerAdapter extends RecyclerView.Adapter<CountRecyclerAdapter.CountViewHolder> {
 
-    private List<Count> items;
+    private ArrayList<Count> items;
     private final Consumer<Integer> callback;
 
     public class CountViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -37,7 +39,7 @@ public class CountRecyclerAdapter extends RecyclerView.Adapter<CountRecyclerAdap
         }
     }
 
-    public CountRecyclerAdapter(List<Count> items, final Consumer<Integer> callback) {
+    public CountRecyclerAdapter(ArrayList<Count> items, final Consumer<Integer> callback) {
         this.items = items;
         this.callback = callback;
     }
@@ -75,5 +77,13 @@ public class CountRecyclerAdapter extends RecyclerView.Adapter<CountRecyclerAdap
 
     public Count get(int index) {
         return items.get(index);
+    }
+
+    public ArrayList<Count> getItems() {
+        return items;
+    }
+
+    public void setItems(ArrayList<Count> items) {
+        this.items = items;
     }
 }

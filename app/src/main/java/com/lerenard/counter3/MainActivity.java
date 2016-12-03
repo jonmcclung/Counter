@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     static final int NEW_COUNT = 0,
             UPDATE_COUNT = 1;
     private static final String
-            KEY_LIST_VIEW_STATE = "KEY_LIST_VIEW_STATE";
+            KEY_ITEMS = "KEY_ITEMS";
     public static final String
             TAG = "__MainActivity",
             INTENT_EXTRA_COUNT = "INTENT_EXTRA_COUNT",
@@ -84,23 +84,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Context context = getApplicationContext();
-        if (true) {
-//        if (savedInstanceState == null) {
-            List<Count> countArray = new ArrayList<>();
+        adapter = new CountRecyclerAdapter(new ArrayList<Count>(), update);
+        if (savedInstanceState == null) {
+            ArrayList<Count> countArray = new ArrayList<>();
             countArray.add(new Count("two" , 2));
             countArray.add(new Count("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum volutpat nisl quis aliquet molestie. Vestibulum nec metus eget magna dictum blandit. Proin id est nec orci euismod facilisis. Curabitur at scelerisque nisi, et molestie enim. Sed quis magna euismod odio sagittis porttitor quis aliquet mi. Integer placerat neque eget porttitor congue. In id lorem neque. Nunc eleifend leo et quam sollicitudin sagittis. Vivamus ultricies accumsan felis eget rutrum.\n" + "\n" + "Sed eget est vestibulum, luctus lacus eu, bibendum nisl. Phasellus a massa turpis. Nam sed risus consectetur, blandit lectus ut, porta nisi. Suspendisse a egestas elit. Suspendisse potenti. Ut at vestibulum urna. Fusce placerat porta purus, eget dapibus odio tempor vel.\n" + "\n" + "Integer sapien elit, tempor eu facilisis a, volutpat eu enim. Pellentesque sed interdum neque. Vivamus lacus mi, molestie vel mi sodales, accumsan finibus quam. In ac vestibulum erat. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse vitae dui quis augue aliquam maximus. Aliquam consectetur nunc vitae purus iaculis, id rutrum velit tincidunt. Mauris consectetur laoreet arcu ut consequat. Quisque tincidunt, nisl quis venenatis auctor, mauris velit finibus tellus, ornare ullamcorper elit erat vel nibh. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla viverra fermentum felis. Vestibulum tincidunt et tellus at sodales. Morbi nec volutpat mauris. Ut eu consectetur dolor. Nam facilisis lobortis accumsan. Ut tristique eget est eu laoreet.\n" + "\n" + "In hendrerit non risus eget auctor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum in euismod turpis. Fusce viverra fermentum velit. Sed ac magna sollicitudin, fringilla elit eu, ultrices ante. Quisque imperdiet nibh sed metus consectetur dignissim. Integer tempus sodales ante, sit amet porttitor nisl malesuada ut. Sed sodales vestibulum odio in finibus. Nam viverra sem ac suscipit interdum. Cras nec libero vestibulum, cursus elit non, blandit nisi. Donec elementum ante dui, ac mattis lorem pharetra eget. In hac habitasse platea dictumst.\n" + "\n" + "Aenean malesuada nibh purus, aliquam hendrerit neque dictum non. Fusce vel lectus et ligula faucibus vestibulum vel lacinia dui. Vivamus in gravida felis. Cras a erat mollis nunc lobortis vulputate et vel mauris. Curabitur ut fringilla metus. Mauris feugiat odio tincidunt tellus convallis, in auctor dolor vestibulum. Integer vel viverra libero. Fusce nec arcu nunc.", 1));
             countArray.add(new Count("one", 1));
             Log.d(TAG, countArray.toString());
-            adapter = new CountRecyclerAdapter(countArray, update);
+            adapter.setItems(countArray);
             Snackbar.make(findViewById(R.id.main_layout), "onCreate()", Snackbar.LENGTH_SHORT).show();
         }
         else {
-            adapter = new CountRecyclerAdapter(new ArrayList<Count>(), update);
-            Snackbar.make(findViewById(R.id.main_layout), "onCreate(" + savedInstanceState.toString() + ")", Snackbar.LENGTH_SHORT).show();
-            if (savedInstanceState.containsKey(KEY_LIST_VIEW_STATE)) {
-//                recyclerView.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_LIST_VIEW_STATE));
+            if (savedInstanceState.containsKey(KEY_ITEMS)) {
+                adapter.setItems(savedInstanceState.<Count>getParcelableArrayList(KEY_ITEMS));
             }
+            Snackbar.make(findViewById(R.id.main_layout), "onCreate(" + savedInstanceState.toString() + ")", Snackbar.LENGTH_SHORT).show();
         }
         recyclerView.setAdapter(adapter);
     }
@@ -108,8 +106,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(KEY_ITEMS, ((CountRecyclerAdapter) recyclerView.getAdapter()).getItems());
 //        adapter.onSaveInstanceState(outState);
 //        outState.putParcelable(KEY_LIST_VIEW_STATE, recyclerView.onSaveInstanceState());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState.containsKey(KEY_ITEMS)) {
+            ((CountRecyclerAdapter) recyclerView.getAdapter()).setItems(savedInstanceState.<Count>getParcelableArrayList(KEY_ITEMS));
+        }
     }
 
     @Override
