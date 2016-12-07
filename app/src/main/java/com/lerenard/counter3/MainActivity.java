@@ -2,6 +2,7 @@ package com.lerenard.counter3;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 
+import com.lerenard.counter3.database.DatabaseHandler;
 import com.lerenard.counter3.util.Consumer;
 
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Parcelable recyclerViewState;
     private CountRecyclerAdapter adapter;
+    private DatabaseHandler databaseHandler;
 
     private Consumer<Integer> update = new Consumer<Integer>() {
         @Override
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -69,54 +73,22 @@ public class MainActivity extends AppCompatActivity {
                         this,
                         LinearLayoutManager.VERTICAL,
                         false));
-        if (BuildConfig.DEBUG && !recyclerView.getLayoutManager().canScrollVertically()) {
-            throw new AssertionError();
-        }
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
 
         adapter = new CountRecyclerAdapter(new ArrayList<Count>(), update);
-        if (savedInstanceState == null) {
-            ArrayList<Count> countArray = new ArrayList<>();
-            countArray.add(new Count("two" , 2));
-            countArray.add(new Count("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum volutpat nisl quis aliquet molestie. Vestibulum nec metus eget magna dictum blandit. Proin id est nec orci euismod facilisis. Curabitur at scelerisque nisi, et molestie enim. Sed quis magna euismod odio sagittis porttitor quis aliquet mi. Integer placerat neque eget porttitor congue. In id lorem neque. Nunc eleifend leo et quam sollicitudin sagittis. Vivamus ultricies accumsan felis eget rutrum.\n" + "\n" + "Sed eget est vestibulum, luctus lacus eu, bibendum nisl. Phasellus a massa turpis. Nam sed risus consectetur, blandit lectus ut, porta nisi. Suspendisse a egestas elit. Suspendisse potenti. Ut at vestibulum urna. Fusce placerat porta purus, eget dapibus odio tempor vel.\n" + "\n" + "Integer sapien elit, tempor eu facilisis a, volutpat eu enim. Pellentesque sed interdum neque. Vivamus lacus mi, molestie vel mi sodales, accumsan finibus quam. In ac vestibulum erat. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse vitae dui quis augue aliquam maximus. Aliquam consectetur nunc vitae purus iaculis, id rutrum velit tincidunt. Mauris consectetur laoreet arcu ut consequat. Quisque tincidunt, nisl quis venenatis auctor, mauris velit finibus tellus, ornare ullamcorper elit erat vel nibh. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla viverra fermentum felis. Vestibulum tincidunt et tellus at sodales. Morbi nec volutpat mauris. Ut eu consectetur dolor. Nam facilisis lobortis accumsan. Ut tristique eget est eu laoreet.\n" + "\n" + "In hendrerit non risus eget auctor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum in euismod turpis. Fusce viverra fermentum velit. Sed ac magna sollicitudin, fringilla elit eu, ultrices ante. Quisque imperdiet nibh sed metus consectetur dignissim. Integer tempus sodales ante, sit amet porttitor nisl malesuada ut. Sed sodales vestibulum odio in finibus. Nam viverra sem ac suscipit interdum. Cras nec libero vestibulum, cursus elit non, blandit nisi. Donec elementum ante dui, ac mattis lorem pharetra eget. In hac habitasse platea dictumst.\n" + "\n" + "Aenean malesuada nibh purus, aliquam hendrerit neque dictum non. Fusce vel lectus et ligula faucibus vestibulum vel lacinia dui. Vivamus in gravida felis. Cras a erat mollis nunc lobortis vulputate et vel mauris. Curabitur ut fringilla metus. Mauris feugiat odio tincidunt tellus convallis, in auctor dolor vestibulum. Integer vel viverra libero. Fusce nec arcu nunc.", 1));
-            countArray.add(new Count("one", 1));
-            Log.d(TAG, countArray.toString());
-            adapter.setItems(countArray);
-            Snackbar.make(findViewById(R.id.main_layout), "onCreate()", Snackbar.LENGTH_SHORT).show();
-        }
-        else {
-            if (savedInstanceState.containsKey(KEY_ITEMS)) {
-                adapter.setItems(savedInstanceState.<Count>getParcelableArrayList(KEY_ITEMS));
-            }
-            Snackbar.make(findViewById(R.id.main_layout), "onCreate(" + savedInstanceState.toString() + ")", Snackbar.LENGTH_SHORT).show();
-        }
         recyclerView.setAdapter(adapter);
+        databaseHandler = new DatabaseHandler(this);
+        new AsyncTask<Void, Void, Void>() {
+            protected Void doInBackground(Void... params) {
+                adapter.setItems(databaseHandler.getAllCounts());
+                return null;
+            }
+        }.execute();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(KEY_ITEMS, ((CountRecyclerAdapter) recyclerView.getAdapter()).getItems());
-//        adapter.onSaveInstanceState(outState);
-//        outState.putParcelable(KEY_LIST_VIEW_STATE, recyclerView.onSaveInstanceState());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState.containsKey(KEY_ITEMS)) {
-            ((CountRecyclerAdapter) recyclerView.getAdapter()).setItems(savedInstanceState.<Count>getParcelableArrayList(KEY_ITEMS));
-        }
     }
 
     @Override
@@ -144,23 +116,38 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-
             if (requestCode == NEW_COUNT || requestCode == UPDATE_COUNT) {
                 Bundle extras = data.getExtras();
                 if (extras == null) {
                     throw new IllegalArgumentException("Intent passed RESULT_OK but empty intent.");
                 }
-                Count count = (Count) extras.getParcelable(MainActivity.INTENT_EXTRA_COUNT);
-                assert count != null;
-                Snackbar.make(findViewById(R.id.main_layout), count.toString(), Snackbar.LENGTH_LONG).show();
+
+                final Count count = (Count) extras.getParcelable(MainActivity.INTENT_EXTRA_COUNT);
                 if (requestCode == NEW_COUNT) {
-                    adapter.add(count);
-                } else /*if (requestCode == UPDATE_COUNT)*/ {
-                    adapter.get(
-                            extras.getInt(MainActivity.INTENT_EXTRA_INDEX)).copyFrom(count);
+                    new AsyncTask<Void, Void, Void>() {
+                        protected Void doInBackground(Void... params) {
+                            databaseHandler.addCount(count);
+                            adapter.add(count);
+                            return null;
+                        }
+                    }.execute();
                 }
+                else {
+                    Count updateMe = adapter.get(
+                            extras.getInt(MainActivity.INTENT_EXTRA_INDEX));
+                    updateMe.copyFrom(count);
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            databaseHandler.updateCount(count);
+                            return null;
+                        }
+                    }.execute();
+                }
+                Snackbar.make(findViewById(R.id.main_layout), count.toString(), Snackbar.LENGTH_LONG).show();
                 adapter.notifyDataSetChanged();
-            } else {
+            }
+            else {
                 throw new IllegalArgumentException("unexpected requestCode " + Integer.toString(requestCode));
             }
         }

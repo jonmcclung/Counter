@@ -10,6 +10,16 @@ public class Count implements Parcelable {
     private String name;
     private int count;
 
+    public long getId() {
+        return _id;
+    }
+
+    public void setId(long _id) {
+        this._id = _id;
+    }
+
+    private long _id;
+
     protected Count(Count count) {
         copyFrom(count);
     }
@@ -17,6 +27,7 @@ public class Count implements Parcelable {
     protected Count(Parcel in) {
         name = in.readString();
         count = in.readInt();
+        _id = in.readLong();
     }
 
     public static final Creator<Count> CREATOR = new Creator<Count>() {
@@ -48,8 +59,13 @@ public class Count implements Parcelable {
     }
 
     Count(String n, int c) {
+        this(-1, n, c);
+    }
+
+    public Count(long id, String n, int c) {
         name = n;
         count = c;
+        _id = id;
     }
 
     Count(String n) {
@@ -59,7 +75,7 @@ public class Count implements Parcelable {
     Count() {this("");}
 
     public String toString() {
-        return "<Count(\"" + name + "\", " + count + ")>";
+        return "<Count(" + _id + ", \"" + name + "\", " + count + ")>";
     }
 
     @Override
@@ -71,10 +87,12 @@ public class Count implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
         dest.writeInt(count);
+        dest.writeLong(_id);
     }
 
     public void copyFrom(Count count) {
         name = count.name;
         this.count = count.count;
+        _id = count._id;
     }
 }

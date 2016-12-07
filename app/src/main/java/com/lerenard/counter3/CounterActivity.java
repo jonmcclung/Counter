@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,8 @@ import java.util.Locale;
 
 public class CounterActivity extends AppCompatActivity {
 
+    private static final String TAG = "COUNTER_ACTIVITY_TAG";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +25,7 @@ public class CounterActivity extends AppCompatActivity {
         final EditText titleView = (EditText) findViewById(R.id.counter_title);
         final TextView countDisplayView = (TextView) findViewById(R.id.count_display);
         final int index;
-        Count count;
+        final Count count;
         if (extras != null) {
             count = (Count) extras.getParcelable(MainActivity.INTENT_EXTRA_COUNT);
             index = extras.getInt(MainActivity.INTENT_EXTRA_INDEX, -1);
@@ -31,7 +34,7 @@ public class CounterActivity extends AppCompatActivity {
             index = -1;
         }
         assert count != null;
-
+        Log.d(TAG, Long.toString(count.getId()));
         titleView.setText(count.getName());
         countDisplayView.setText(String.format(Locale.getDefault(), "%d", count.getCount()));
 
@@ -60,11 +63,11 @@ public class CounterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent data = new Intent();
+                count.setName(String.valueOf(titleView.getText()));
+                count.setCount(Integer.parseInt(String.valueOf(countDisplayView.getText())));
                 data.putExtra(
                         MainActivity.INTENT_EXTRA_COUNT,
-                        new Count(
-                                String.valueOf(titleView.getText()),
-                                Integer.parseInt(String.valueOf(countDisplayView.getText()))));
+                        count);
                 if (index != -1) {
                     data.putExtra(MainActivity.INTENT_EXTRA_INDEX, index);
                 }
