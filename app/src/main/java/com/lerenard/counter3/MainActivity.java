@@ -1,30 +1,22 @@
 package com.lerenard.counter3;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ListView;
 
 import com.lerenard.counter3.database.DatabaseHandler;
 import com.lerenard.counter3.util.Consumer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DataSetListener<Count> {
 
     static final int NEW_COUNT = 0,
             UPDATE_COUNT = 1;
@@ -35,20 +27,26 @@ public class MainActivity extends AppCompatActivity {
             INTENT_EXTRA_COUNT = "INTENT_EXTRA_COUNT",
             INTENT_EXTRA_INDEX = "INTENT_EXTRA_INDEX";
 
-    private RecyclerView recyclerView;
-    private Parcelable recyclerViewState;
-    private CountRecyclerAdapter adapter;
+    private CountRecyclerViewAdapter adapter;
     private DatabaseHandler databaseHandler;
 
     private Consumer<Integer> update = new Consumer<Integer>() {
         @Override
         public void accept(Integer index) {
             Intent intent = new Intent(getApplicationContext(), CounterActivity.class);
-            intent.putExtra(INTENT_EXTRA_COUNT, adapter.get(index));
-            intent.putExtra(INTENT_EXTRA_INDEX, index);
-            startActivityForResult(intent, UPDATE_COUNT);
+//            intent.putExtra(INTENT_EXTRA_COUNT, adapter.get(index));
+//            intent.putExtra(INTENT_EXTRA_INDEX, index);
+//            startActivityForResult(intent, UPDATE_COUNT);
+            startActivityForResult(intent, NEW_COUNT);
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        databaseHandler.getCursor().close();
+        databaseHandler.close();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,28 +65,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        recyclerView = (RecyclerView) findViewById(R.id.list);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setLayoutManager(
                 new LinearLayoutManager(
                         this,
                         LinearLayoutManager.VERTICAL,
                         false));
 
-        adapter = new CountRecyclerAdapter(new ArrayList<Count>(), update);
-        recyclerView.setAdapter(adapter);
         databaseHandler = new DatabaseHandler(this);
-        new AsyncTask<Void, Void, Void>() {
-            protected Void doInBackground(Void... params) {
-                adapter.setItems(databaseHandler.getAllCounts());
-                return null;
-            }
-        }.execute();
+        adapter = new CountRecyclerViewAdapter(this, databaseHandler.getCursor(), this);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(KEY_ITEMS, ((CountRecyclerAdapter) recyclerView.getAdapter()).getItems());
+//        outState.putParcelableArrayList(KEY_ITEMS, ((CountRecyclerViewAdapter) recyclerView
+// .getAdapter()).getItems());
     }
 
     @Override
@@ -127,29 +120,82 @@ public class MainActivity extends AppCompatActivity {
                     new AsyncTask<Void, Void, Void>() {
                         protected Void doInBackground(Void... params) {
                             databaseHandler.addCount(count);
-                            adapter.add(count);
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    adapter.changeCursor(databaseHandler.getCursor());
+                                }
+                            });
                             return null;
                         }
                     }.execute();
                 }
                 else {
-                    Count updateMe = adapter.get(
-                            extras.getInt(MainActivity.INTENT_EXTRA_INDEX));
-                    updateMe.copyFrom(count);
+//                    Count updateMe = extras.getParcelable(INTENT_EXTRA_COUNT);
+//                    updateMe.copyFrom(count);
                     new AsyncTask<Void, Void, Void>() {
                         @Override
                         protected Void doInBackground(Void... params) {
                             databaseHandler.updateCount(count);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.changeCursor(databaseHandler.getCursor());
+                                }
+                            });
                             return null;
                         }
                     }.execute();
                 }
-                Snackbar.make(findViewById(R.id.main_layout), count.toString(), Snackbar.LENGTH_LONG).show();
-                adapter.notifyDataSetChanged();
+                Snackbar.make(
+                        findViewById(R.id.main_layout),
+                        count.toString(),
+                        Snackbar.LENGTH_LONG).show();
             }
             else {
-                throw new IllegalArgumentException("unexpected requestCode " + Integer.toString(requestCode));
+                throw new IllegalArgumentException(
+                        "unexpected requestCode " + Integer.toString(requestCode));
             }
         }
+    }
+
+    @Override
+    public void onDelete(final Count count) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                databaseHandler.deleteCount(count);
+                adapter.changeCursor(databaseHandler.getCursor());
+                return null;
+            }
+        }.execute();
+    }
+
+    @Override
+    public void onUpdate(final Count count) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                databaseHandler.updateCount(count);
+                adapter.changeCursor(databaseHandler.getCursor());
+                return null;
+            }
+        }.execute();
+    }
+
+    @Override
+    public void onClick(Count count) {
+        Intent intent = new Intent(getApplicationContext(), CounterActivity.class);
+        intent.putExtra(INTENT_EXTRA_COUNT, count);
+        startActivityForResult(intent, UPDATE_COUNT);
+    }
+
+    @Override
+    public void onDrag(Count count, int start, int end) {
+
+    }
+
+    @Override
+    public void onLongPress(Count count) {
+
     }
 }

@@ -1,5 +1,6 @@
 package com.lerenard.counter3;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 

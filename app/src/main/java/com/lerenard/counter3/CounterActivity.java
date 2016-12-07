@@ -22,20 +22,16 @@ public class CounterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_counter);
         Bundle extras = getIntent().getExtras();
-        final EditText titleView = (EditText) findViewById(R.id.counter_title);
+        final EditText nameView = (EditText) findViewById(R.id.counter_title);
         final TextView countDisplayView = (TextView) findViewById(R.id.count_display);
-        final int index;
         final Count count;
         if (extras != null) {
             count = (Count) extras.getParcelable(MainActivity.INTENT_EXTRA_COUNT);
-            index = extras.getInt(MainActivity.INTENT_EXTRA_INDEX, -1);
         } else {
             count = new Count();
-            index = -1;
         }
-        assert count != null;
         Log.d(TAG, Long.toString(count.getId()));
-        titleView.setText(count.getName());
+        nameView.setText(count.getName());
         countDisplayView.setText(String.format(Locale.getDefault(), "%d", count.getCount()));
 
         countDisplayView.setOnClickListener(new View.OnClickListener() {
@@ -54,7 +50,7 @@ public class CounterActivity extends AppCompatActivity {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                countDisplayView.setText(R.string.starting_value);
+                countDisplayView.setText(String.format(Locale.getDefault(), "%d", 0));
             }
         });
 
@@ -63,14 +59,11 @@ public class CounterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent data = new Intent();
-                count.setName(String.valueOf(titleView.getText()));
+                count.setName(String.valueOf(nameView.getText()));
                 count.setCount(Integer.parseInt(String.valueOf(countDisplayView.getText())));
                 data.putExtra(
                         MainActivity.INTENT_EXTRA_COUNT,
                         count);
-                if (index != -1) {
-                    data.putExtra(MainActivity.INTENT_EXTRA_INDEX, index);
-                }
                 setResult(RESULT_OK, data);
                 finish();
             }

@@ -55,7 +55,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    private Count getCountFromCursor(Cursor cursor) {
+    public static Count getCountFromCursor(Cursor cursor) {
         return new Count(
                 cursor.getInt(cursor.getColumnIndex(_ID)),
                 cursor.getString(cursor.getColumnIndex(COUNTS_NAME)),
@@ -134,5 +134,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] {Long.toString(count.getId())});
 
         db.close();
+    }
+
+    public Cursor getCursor() {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.rawQuery("SELECT "
+                                    + _ID + ", "
+                                    + COUNTS_NAME + ", "
+                                    + COUNTS_COUNT + " FROM "
+                                    + TABLE_COUNTS, null);
     }
 }
