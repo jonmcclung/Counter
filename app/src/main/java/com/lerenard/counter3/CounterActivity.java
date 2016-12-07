@@ -3,9 +3,12 @@ package com.lerenard.counter3;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +19,22 @@ import java.util.Locale;
 public class CounterActivity extends AppCompatActivity {
 
     private static final String TAG = "COUNTER_ACTIVITY_TAG";
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.counter_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_help:
+                showHelp();
+                return true;
+        }
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +90,7 @@ public class CounterActivity extends AppCompatActivity {
     }
 
 
-    public void showHelp(View view) {
+    public void showHelp() {
         new AlertDialog.Builder(CounterActivity.this)
                 .setTitle(R.string.help_title)
                 .setMessage(R.string.help_message)

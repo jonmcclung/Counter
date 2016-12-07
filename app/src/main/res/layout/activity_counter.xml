@@ -42,15 +42,4 @@
         android:layout_alignRight="@+id/counter_title"
         android:layout_alignEnd="@+id/counter_title" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/help_button_text"
-        android:id="@+id/help_button"
-        android:textSize="@dimen/help_button_text_size"
-        android:onClick="showHelp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
 </RelativeLayout>
