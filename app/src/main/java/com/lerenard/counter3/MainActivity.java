@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +18,8 @@ import android.view.View;
 import com.lerenard.counter3.database.DatabaseHandler;
 import com.lerenard.counter3.util.Consumer;
 
-public class MainActivity extends AppCompatActivity implements DataSetListener<Count> {
+public class MainActivity extends AppCompatActivity
+        implements DataSetListener<Count>, ItemTouchHelperAdapter {
 
     static final int NEW_COUNT = 0,
             UPDATE_COUNT = 1;
@@ -24,14 +27,17 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
             KEY_ITEMS = "KEY_ITEMS";
     public static final String
             TAG = "__MainActivity",
+            INTENT_EXTRA_INDEX = "INTENT_EXTRA_INDEX",
             INTENT_EXTRA_COUNT = "INTENT_EXTRA_COUNT";
 
     private CountRecyclerViewAdapter adapter;
     private DatabaseHandler databaseHandler;
+    private RecyclerView recyclerView;
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "stopping");
         databaseHandler.getCursor().close();
         databaseHandler.close();
     }
@@ -53,15 +59,15 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
             }
         });
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+        recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setLayoutManager(
                 new LinearLayoutManager(
                         this,
                         LinearLayoutManager.VERTICAL,
-                        false));
+                        true));
 
         databaseHandler = new DatabaseHandler(this);
-        adapter = new CountRecyclerViewAdapter(this, databaseHandler.getCursor(), this);
+        adapter = new CountRecyclerViewAdapter(this, databaseHandler.getAllCounts(), this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -97,44 +103,19 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
                 }
 
                 final Count count = (Count) extras.getParcelable(MainActivity.INTENT_EXTRA_COUNT);
+                assert count != null;
+
                 if (requestCode == NEW_COUNT) {
-                    new AsyncTask<Void, Void, Void>() {
-                        protected Void doInBackground(Void... params) {
-                            databaseHandler.addCount(count);
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-                                    adapter.changeCursor(databaseHandler.getCursor());
-                                    Snackbar.make(
-                                            findViewById(R.id.main_layout),
-                                            count.toBriefString(),
-                                            Snackbar.LENGTH_LONG).show();
-                                }
-                            });
-                            return null;
-                        }
-                    }.execute();
+                    adapter.add(count);
                 }
                 else {
-//                    Count updateMe = extras.getParcelable(INTENT_EXTRA_COUNT);
-//                    updateMe.copyFrom(count);
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            databaseHandler.updateCount(count);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.changeCursor(databaseHandler.getCursor());
-                                    Snackbar.make(
-                                            findViewById(R.id.main_layout),
-                                            count.toBriefString(),
-                                            Snackbar.LENGTH_LONG).show();
-                                }
-                            });
-                            return null;
-                        }
-                    }.execute();
+                    int index = extras.getInt(MainActivity.INTENT_EXTRA_INDEX);
+                    adapter.set(index, count);
                 }
+                Snackbar.make(
+                        findViewById(R.id.main_layout),
+                        count.toBriefString(),
+                        Snackbar.LENGTH_LONG).show();
             }
             else {
                 throw new IllegalArgumentException(
@@ -144,12 +125,22 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
     }
 
     @Override
+    public void onAdd(final Count count) {
+        recyclerView.getLayoutManager().scrollToPosition(adapter.getItemCount() - 1);
+        new AsyncTask<Void, Void, Void>() {
+            protected Void doInBackground(Void... params) {
+                databaseHandler.addCount(count);
+                return null;
+            }
+        }.execute();
+    }
+
+    @Override
     public void onDelete(final Count count) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 databaseHandler.deleteCount(count);
-                adapter.changeCursor(databaseHandler.getCursor());
                 return null;
             }
         }.execute();
@@ -161,16 +152,16 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
             @Override
             protected Void doInBackground(Void... params) {
                 databaseHandler.updateCount(count);
-                adapter.changeCursor(databaseHandler.getCursor());
                 return null;
             }
         }.execute();
     }
 
     @Override
-    public void onClick(Count count) {
+    public void onClick(Count count, int position) {
         Intent intent = new Intent(getApplicationContext(), CounterActivity.class);
         intent.putExtra(INTENT_EXTRA_COUNT, count);
+        intent.putExtra(INTENT_EXTRA_INDEX, position);
         startActivityForResult(intent, UPDATE_COUNT);
     }
 
@@ -180,7 +171,16 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
     }
 
     @Override
-    public void onLongPress(Count count) {
+    public void onLongPress(Count count, int position) {
+
+    }
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
 
     }
 }

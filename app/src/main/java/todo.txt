@@ -1,0 +1,22 @@
+remove count by:
+    swiping
+    long-pressing
+option to undo after removing
+
+move counts around
+
+make back button save changes, change save button to revert button
+
+select in bulk, select all, change color, remove
+
+change font size as setting
+
+change color of count
+
+long press options:
+    remove
+    edit color
+    edit
+
+option to log in
+

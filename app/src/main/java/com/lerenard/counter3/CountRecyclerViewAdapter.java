@@ -16,24 +16,59 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /**
- * The adapter is only responsible for the UI stuff. It delegates any events it notices to
- * the listener, so that we have a good separation of UI from logic.
+ * The adapter has an internal copy of the data. When something happens,
+ * it notifies the DataSetListener about it so that it can react appropriately. It is
+ * allows dragging items around and swiping to delete.
  */
 public class CountRecyclerViewAdapter
-        extends CursorRecyclerViewAdapter<CountRecyclerViewAdapter.CountViewHolder>
+        extends RecyclerView.Adapter<CountRecyclerViewAdapter.CountViewHolder>
         implements ItemTouchHelperAdapter {
 
     private static String TAG = "CountRecyclerViewAdapter";
     private final DataSetListener<Count> listener;
+    private ArrayList<Count> items;
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
-        //TODO
+        if (fromPosition == toPosition) {
+            return;
+        }
+        Count moved = items.get(fromPosition);
+        if (fromPosition > toPosition) {
+            for (int i = fromPosition; i > toPosition; --i) {
+                items.set(i, items.get(i - 1));
+            }
+        }
+        else {
+            for (int i = fromPosition; i < toPosition; ++i) {
+                items.set(i, items.get(i + 1));
+            }
+        }
+        items.set(toPosition, moved);
+        listener.onDrag(moved, fromPosition, toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
-        //TODO
+        remove(position);
+    }
+
+    public void remove(int position) {
+        Count removed = items.remove(position);
+        notifyItemRemoved(position);
+        listener.onDelete(removed);
+    }
+
+    public void add(Count count) {
+        items.add(count);
+        notifyItemInserted(items.size() - 1);
+        listener.onAdd(count);
+    }
+
+    public void set(int index, Count count) {
+        items.set(index, count);
+        notifyItemChanged(index);
+        listener.onUpdate(count);
     }
 
     public class CountViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -60,7 +95,7 @@ public class CountRecyclerViewAdapter
 
         @Override
         public void onClick(View v) {
-            listener.onClick(count);
+            listener.onClick(count, getAdapterPosition());
         }
 
         public void setCount(Count count) {
@@ -72,9 +107,9 @@ public class CountRecyclerViewAdapter
 
     public CountRecyclerViewAdapter(
             Context context,
-            Cursor cursor,
+            ArrayList<Count> items,
             DataSetListener<Count> listener) {
-        super(context, cursor);
+        this.items = items;
         this.listener = listener;
     }
 
@@ -87,13 +122,12 @@ public class CountRecyclerViewAdapter
     }
 
     @Override
-    public void onBindViewHolder(final CountViewHolder holder, Cursor cursor) {
-        final Count count = DatabaseHandler.getCountFromCursor(cursor);
-        holder.setCount(count);
+    public void onBindViewHolder(CountViewHolder holder, int position) {
+        holder.setCount(items.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return getCursor().getCount();
+        return items.size();
     }
 }

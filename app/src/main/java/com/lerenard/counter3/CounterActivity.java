@@ -44,11 +44,15 @@ public class CounterActivity extends AppCompatActivity {
         final EditText nameView = (EditText) findViewById(R.id.counter_title);
         final TextView countDisplayView = (TextView) findViewById(R.id.count_display);
         final Count count;
+        final int index;
         if (extras != null) {
             count = (Count) extras.getParcelable(MainActivity.INTENT_EXTRA_COUNT);
+            index = extras.getInt(MainActivity.INTENT_EXTRA_INDEX);
         } else {
             count = new Count();
+            index = -1;
         }
+        assert count != null;
         Log.d(TAG, Long.toString(count.getId()));
         nameView.setText(count.getName());
         countDisplayView.setText(String.format(Locale.getDefault(), "%d", count.getCount()));
@@ -83,6 +87,9 @@ public class CounterActivity extends AppCompatActivity {
                 data.putExtra(
                         MainActivity.INTENT_EXTRA_COUNT,
                         count);
+                if (index != -1) {
+                    data.putExtra(MainActivity.INTENT_EXTRA_INDEX, index);
+                }
                 setResult(RESULT_OK, data);
                 finish();
             }

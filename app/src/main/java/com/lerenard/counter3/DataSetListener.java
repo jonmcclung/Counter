@@ -4,13 +4,15 @@ package com.lerenard.counter3;
  * Created by mc on 07-Dec-16.
  */
 public interface DataSetListener<T> {
-    void onDelete(T t);
+    void onAdd(final T t);
 
-    void onUpdate(T t);
+    void onDelete(final T t);
 
-    void onClick(T t);
+    void onUpdate(final T t);
 
-    void onDrag(T t, int start, int end);
+    void onClick(final T t, int position);
 
-    void onLongPress(T t);
+    void onDrag(final T t, int start, int end);
+
+    void onLongPress(final T t, int position);
 }

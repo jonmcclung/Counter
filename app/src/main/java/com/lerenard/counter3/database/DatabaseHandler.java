@@ -77,26 +77,55 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("COMMIT");
         }
         if (oldVersion < 3) {
-            db.execSQL("ALTER TABLE " + TABLE_COUNTS + " ADD COLUMN " + COUNTS_POSITION + " INTEGER DEFAULT -1");
+            db.execSQL("ALTER TABLE " + TABLE_COUNTS + " ADD COLUMN " + COUNTS_POSITION +
+                       " INTEGER DEFAULT -1");
         }
+    }
+
+    public void moveCount(int id, int fromPosition, int toPosition) {
+        if (fromPosition == toPosition) {
+            return;
+        }
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COUNTS_POSITION, toPosition);
+        String whereClause =
+                COUNTS_POSITION + " >= " + Math.min(toPosition, fromPosition) + " and " +
+                COUNTS_POSITION + " <= " + Math.max(toPosition, fromPosition);
+
+        db.beginTransaction();
+        try {
+            db.execSQL(
+                    "UPDATE " + TABLE_COUNTS + " SET " + COUNTS_POSITION + " = " + COUNTS_POSITION +
+                    (fromPosition > toPosition ? " +" : " -") + " 1 WHERE " + whereClause);
+
+            db.update(
+                    TABLE_COUNTS,
+                    values,
+                    _ID + " = ?",
+                    new String[]{String.valueOf(id)});
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        db.close();
     }
 
     public void addCount(Count count) {
         SQLiteDatabase db = getWritableDatabase();
-        if (count.getPosition() == -1) {
-            count.setPosition(itemCount++);
-        }
-        count.setId(db.insert(TABLE_COUNTS, null, getValues(count)));
+        ContentValues values = getValues(count);
+        values.put(COUNTS_POSITION, itemCount++);
+        count.setId(db.insert(TABLE_COUNTS, null, values));
         db.close();
-
     }
 
     public static Count getCountFromCursor(Cursor cursor) {
         return new Count(
                 cursor.getInt(cursor.getColumnIndex(_ID)),
                 cursor.getString(cursor.getColumnIndex(COUNTS_NAME)),
-                cursor.getInt(cursor.getColumnIndex(COUNTS_COUNT)),
-                cursor.getInt(cursor.getColumnIndex(COUNTS_POSITION)));
+                cursor.getInt(cursor.getColumnIndex(COUNTS_COUNT)));
     }
 
     public Count getCount(int id) {
@@ -134,7 +163,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * doesn't include the count id as it's assumed that you will
+     * Retrieve the values to be inserted for the given count.
+     * Doesn't include the count id as it's assumed that you will
      * use a where clause with that or that it's otherwise
      * not useful.
      */
@@ -142,7 +172,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COUNTS_NAME, count.getName());
         values.put(COUNTS_COUNT, count.getCount());
-        values.put(COUNTS_POSITION, count.getPosition());
         return values;
     }
 
@@ -160,12 +189,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void deleteCount(Count count) {
         SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            Cursor cursor = db.query(
+                    TABLE_COUNTS,
+                    new String[]{COUNTS_POSITION},
+                    _ID + " = ?",
+                    new String[]{String.valueOf(count.getId())},
+                    null, null, null);
 
-        db.delete(
-                TABLE_COUNTS,
-                _ID + " = ?",
-                new String[]{Long.toString(count.getId())});
-        --itemCount;
+            int oldPosition = cursor.getInt(cursor.getColumnIndex(COUNTS_POSITION));
+            cursor.close();
+
+            db.delete(
+                    TABLE_COUNTS,
+                    _ID + " = ?",
+                    new String[]{Long.toString(count.getId())});
+            --itemCount;
+
+            db.execSQL("UPDATE " + TABLE_COUNTS +
+                       " SET " + COUNTS_POSITION + " = " + COUNTS_POSITION + " - 1" +
+                       " WHERE " + COUNTS_POSITION + " > " + Integer.toString(oldPosition));
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
         db.close();
     }
 
@@ -177,7 +225,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + COUNTS_COUNT + ", "
                 + COUNTS_POSITION + " FROM "
                 + TABLE_COUNTS
-                + " ORDER BY " + COUNTS_POSITION + " DESC", null);
+                + " ORDER BY " + COUNTS_POSITION, null);
         itemCount = res.getCount();
         return res;
     }
