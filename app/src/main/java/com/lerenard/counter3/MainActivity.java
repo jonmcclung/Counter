@@ -24,22 +24,10 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
             KEY_ITEMS = "KEY_ITEMS";
     public static final String
             TAG = "__MainActivity",
-            INTENT_EXTRA_COUNT = "INTENT_EXTRA_COUNT",
-            INTENT_EXTRA_INDEX = "INTENT_EXTRA_INDEX";
+            INTENT_EXTRA_COUNT = "INTENT_EXTRA_COUNT";
 
     private CountRecyclerViewAdapter adapter;
     private DatabaseHandler databaseHandler;
-
-    private Consumer<Integer> update = new Consumer<Integer>() {
-        @Override
-        public void accept(Integer index) {
-            Intent intent = new Intent(getApplicationContext(), CounterActivity.class);
-//            intent.putExtra(INTENT_EXTRA_COUNT, adapter.get(index));
-//            intent.putExtra(INTENT_EXTRA_INDEX, index);
-//            startActivityForResult(intent, UPDATE_COUNT);
-            startActivityForResult(intent, NEW_COUNT);
-        }
-    };
 
     @Override
     protected void onDestroy() {
@@ -75,13 +63,6 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
         databaseHandler = new DatabaseHandler(this);
         adapter = new CountRecyclerViewAdapter(this, databaseHandler.getCursor(), this);
         recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-//        outState.putParcelableArrayList(KEY_ITEMS, ((CountRecyclerViewAdapter) recyclerView
-// .getAdapter()).getItems());
     }
 
     @Override
@@ -123,6 +104,10 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
                             runOnUiThread(new Runnable() {
                                 public void run() {
                                     adapter.changeCursor(databaseHandler.getCursor());
+                                    Snackbar.make(
+                                            findViewById(R.id.main_layout),
+                                            count.toBriefString(),
+                                            Snackbar.LENGTH_LONG).show();
                                 }
                             });
                             return null;
@@ -140,16 +125,16 @@ public class MainActivity extends AppCompatActivity implements DataSetListener<C
                                 @Override
                                 public void run() {
                                     adapter.changeCursor(databaseHandler.getCursor());
+                                    Snackbar.make(
+                                            findViewById(R.id.main_layout),
+                                            count.toBriefString(),
+                                            Snackbar.LENGTH_LONG).show();
                                 }
                             });
                             return null;
                         }
                     }.execute();
                 }
-                Snackbar.make(
-                        findViewById(R.id.main_layout),
-                        count.toString(),
-                        Snackbar.LENGTH_LONG).show();
             }
             else {
                 throw new IllegalArgumentException(

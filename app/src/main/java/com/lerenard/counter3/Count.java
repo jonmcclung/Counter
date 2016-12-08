@@ -8,8 +8,25 @@ import android.os.Parcelable;
  * Created by lerenard on 16-Aug-16.
  */
 public class Count implements Parcelable {
+    private long _id;
     private String name;
     private int count;
+    private int position;
+
+    public Count(long id, String n, int c, int pos) {
+        _id = id;
+        name = n;
+        count = c;
+        position = pos;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
 
     public long getId() {
         return _id;
@@ -19,8 +36,6 @@ public class Count implements Parcelable {
         this._id = _id;
     }
 
-    private long _id;
-
     protected Count(Count count) {
         copyFrom(count);
     }
@@ -29,6 +44,7 @@ public class Count implements Parcelable {
         name = in.readString();
         count = in.readInt();
         _id = in.readLong();
+        position = in.readInt();
     }
 
     public static final Creator<Count> CREATOR = new Creator<Count>() {
@@ -64,10 +80,9 @@ public class Count implements Parcelable {
     }
 
     public Count(long id, String n, int c) {
-        name = n;
-        count = c;
-        _id = id;
+        this(id, n, c, -1);
     }
+
 
     Count(String n) {
         this(n, 0);
@@ -76,7 +91,16 @@ public class Count implements Parcelable {
     Count() {this("");}
 
     public String toString() {
-        return "<Count(" + _id + ", \"" + name + "\", " + count + ")>";
+        return "<Count(" + _id + ", \"" + name + "\", " + count + ", " + position + ")>";
+    }
+
+    public String toBriefString() {
+        String briefName = name;
+        int newlineIndex = briefName.indexOf('\n');
+        if (newlineIndex != -1) briefName = briefName.substring(0, newlineIndex);
+        if (briefName.length() >= 10) briefName = briefName.substring(0, 10);
+        if (briefName != name) briefName += "...";
+        return "<Count(" + _id + ", \"" + briefName + "\", " + count + ", " + position + ")>";
     }
 
     @Override
@@ -89,11 +113,13 @@ public class Count implements Parcelable {
         dest.writeString(name);
         dest.writeInt(count);
         dest.writeLong(_id);
+        dest.writeInt(position);
     }
 
     public void copyFrom(Count count) {
         name = count.name;
         this.count = count.count;
         _id = count._id;
+        position = count.position;
     }
 }
