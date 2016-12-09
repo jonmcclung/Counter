@@ -3,6 +3,7 @@ package com.lerenard.counter3;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,29 +55,35 @@ public class CountRecyclerViewAdapter
 
     @Override
     public void onItemDismiss(int position) {
-        remove(position);
+        remove(position, true);
     }
 
-    public void remove(int position) {
+    public void remove(int position, boolean notify) {
         Count removed = items.remove(position);
         notifyItemRemoved(position);
-        listener.onDelete(removed, position);
+        if (notify) {
+            listener.onDelete(removed, position);
+        }
     }
 
-    public void add(Count count) {
-        insert(items.size(), count);
+    public void add(Count count, boolean notify) {
+        insert(items.size(), count, notify);
     }
 
-    public void set(int index, Count count) {
+    public void set(int index, Count count, boolean notify) {
         items.set(index, count);
         notifyItemChanged(index);
-        listener.onUpdate(count);
+        if (notify) {
+            listener.onUpdate(count);
+        }
     }
 
-    public void insert(int index, Count count) {
+    public void insert(int index, Count count, boolean notify) {
         items.add(index, count);
         notifyItemInserted(index);
-        listener.onAdd(count, index);
+        if (notify) {
+            listener.onAdd(count, index);
+        }
     }
 
     public class CountViewHolder extends RecyclerView.ViewHolder

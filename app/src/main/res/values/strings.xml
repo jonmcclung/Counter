@@ -70,9 +70,10 @@
     <string name="enter_name">Enter name</string>
     <string name="starting_value">0</string>
     <string name="save">Save</string>
+    <string name="revert">Revert</string>
     <string name="help_button_text">\?</string>
     <string name="help_title">Help</string>
-    <string name="help_message">Tap on the number to increment it by one, and don\'t forget to save your changes when you\'re done.</string>
+    <string name="help_message">Tap on the number to increment it by one. Your changes are automatically saved when you leave.</string>
     <string name="ok">OK</string>
 
     <!-- miscellaneous -->

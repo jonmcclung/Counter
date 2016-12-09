@@ -74,6 +74,15 @@ public class Count implements Parcelable {
 
     Count() {this("");}
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Count)) {
+            return false;
+        }
+        Count rhs = (Count) obj;
+        return _id == rhs._id && name.equals(rhs.name) && count == rhs.count;
+    }
+
     public String toString() {
         return "<Count(" + _id + ", \"" + name + "\", " + count + ")>";
     }
@@ -81,9 +90,15 @@ public class Count implements Parcelable {
     public String toBriefString() {
         String briefName = name;
         int newlineIndex = briefName.indexOf('\n');
-        if (newlineIndex != -1) briefName = briefName.substring(0, newlineIndex);
-        if (briefName.length() >= 10) briefName = briefName.substring(0, 10);
-        if (!briefName.equals(name)) briefName += "...";
+        if (newlineIndex != -1) {
+            briefName = briefName.substring(0, newlineIndex);
+        }
+        if (briefName.length() >= 10) {
+            briefName = briefName.substring(0, 10);
+        }
+        if (!briefName.equals(name)) {
+            briefName += "...";
+        }
         return "<Count(" + _id + ", \"" + briefName + "\", " + count + ")>";
     }
 

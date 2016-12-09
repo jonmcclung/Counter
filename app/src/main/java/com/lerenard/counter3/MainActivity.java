@@ -3,6 +3,7 @@ package com.lerenard.counter3;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -28,17 +29,28 @@ public class MainActivity extends AppCompatActivity
     public static final String
             TAG = "__MainActivity",
             INTENT_EXTRA_INDEX = "INTENT_EXTRA_INDEX",
-            INTENT_EXTRA_COUNT = "INTENT_EXTRA_COUNT";
+            INTENT_EXTRA_COUNT = "INTENT_EXTRA_COUNT",
+            INTENT_EXTRA_REQUEST_CODE = "INTENT_EXTRA_REQUEST_CODE";
 
     private CountRecyclerViewAdapter adapter;
-    private DatabaseHandler databaseHandler;
+    private static DatabaseHandler databaseHandler;
     private RecyclerView recyclerView;
+
+    public static DatabaseHandler getDatabase() {
+        return databaseHandler;
+    }
 
     @Override
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "stopping");
         databaseHandler.close();
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        intent.putExtra(INTENT_EXTRA_REQUEST_CODE, requestCode);
+        super.startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -99,6 +111,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult, " + requestCode + ", " + resultCode + ", " + data);
         if (resultCode == RESULT_OK) {
             if (requestCode == NEW_COUNT || requestCode == UPDATE_COUNT) {
                 Bundle extras = data.getExtras();
@@ -108,13 +121,13 @@ public class MainActivity extends AppCompatActivity
 
                 final Count count = (Count) extras.getParcelable(MainActivity.INTENT_EXTRA_COUNT);
                 assert count != null;
-
+                Log.d(TAG, "received count " + count.toString());
                 if (requestCode == NEW_COUNT) {
-                    adapter.add(count);
+                    adapter.add(count, false);
                 }
                 else {
                     int index = extras.getInt(MainActivity.INTENT_EXTRA_INDEX);
-                    adapter.set(index, count);
+                    adapter.set(index, count, false);
                 }
                 Snackbar.make(
                         findViewById(R.id.main_layout),
@@ -153,7 +166,7 @@ public class MainActivity extends AppCompatActivity
                 .setAction(R.string.undo_count_deleted, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        adapter.insert(position, count);
+                        adapter.insert(position, count, true);
                     }
                 }).show();
 
