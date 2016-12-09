@@ -1,4 +1,4 @@
-package com.lerenard.counter3.database;
+package com.lerenard.counter3.helper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,10 +9,11 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.lerenard.counter3.Count;
+import com.lerenard.counter3.CountRecyclerViewAdapter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Locale;
 
 /**
  * Created by mc on 06-Dec-16.
@@ -26,7 +27,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     private static final int
-            DATABASE_VERSION = 3;
+            DATABASE_VERSION = 4;
 
     private int itemCount = -1;
 
@@ -80,45 +81,67 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE " + TABLE_COUNTS + " ADD COLUMN " + COUNTS_POSITION +
                        " INTEGER DEFAULT -1");
         }
+        if (oldVersion < 4) {
+            // I accidentally incremented the database version without actually changing anything...
+        }
     }
 
-    public void moveCount(int id, int fromPosition, int toPosition) {
-        if (fromPosition == toPosition) {
-            return;
+    public void moveCount(long fromId, int fromPosition, int toPosition) {
+        if (Math.abs(fromPosition - toPosition) != 1) {
+            Log.e(TAG, "fromPosition: " + fromPosition + ", toPosition: " + toPosition +
+                       ". But they should differ by exactly one");
         }
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COUNTS_POSITION, toPosition);
-        String whereClause =
-                COUNTS_POSITION + " >= " + Math.min(toPosition, fromPosition) + " and " +
-                COUNTS_POSITION + " <= " + Math.max(toPosition, fromPosition);
 
+        Log.d(TAG, toString());
+
+        ContentValues newValuesForTo = new ContentValues();
+        newValuesForTo.put(COUNTS_POSITION, fromPosition);
+
+        ContentValues newValuesForFrom = new ContentValues();
+        newValuesForFrom.put(COUNTS_POSITION, toPosition);
+
+        SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try {
-            db.execSQL(
-                    "UPDATE " + TABLE_COUNTS + " SET " + COUNTS_POSITION + " = " + COUNTS_POSITION +
-                    (fromPosition > toPosition ? " +" : " -") + " 1 WHERE " + whereClause);
 
             db.update(
                     TABLE_COUNTS,
-                    values,
+                    newValuesForTo,
+                    COUNTS_POSITION + " = ?",
+                    new String[]{String.valueOf(toPosition)});
+
+            db.update(
+                    TABLE_COUNTS,
+                    newValuesForFrom,
                     _ID + " = ?",
-                    new String[]{String.valueOf(id)});
+                    new String[]{String.valueOf(fromId)});
 
             db.setTransactionSuccessful();
+            Log.d(TAG, "successfully moved " + fromPosition + " to " + toPosition);
         } finally {
             db.endTransaction();
         }
+        db.close();
+        Log.d(TAG, toString());
+    }
 
+    public void addCount(Count count, int position) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        if (position != itemCount++) {
+            db.execSQL(
+                    "UPDATE " + TABLE_COUNTS + " SET " + COUNTS_POSITION + " = " + COUNTS_POSITION +
+                    " + 1 WHERE " + COUNTS_POSITION + " >= " + position);
+        }
+
+        ContentValues values = getValues(count);
+        values.put(COUNTS_POSITION, position);
+        count.setId(db.insert(TABLE_COUNTS, null, values));
         db.close();
     }
 
     public void addCount(Count count) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = getValues(count);
-        values.put(COUNTS_POSITION, itemCount++);
-        count.setId(db.insert(TABLE_COUNTS, null, values));
-        db.close();
+        addCount(count, itemCount);
     }
 
     public static Count getCountFromCursor(Cursor cursor) {
@@ -187,6 +210,48 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void batchDeleteCount(Collection<Count> counts) {
+
+    }
+
+    public String toString() {
+        SQLiteDatabase db = getReadableDatabase();
+
+        StringBuilder stringBuilder = new StringBuilder(), line = new StringBuilder();
+        int width = 15;
+        String formatString = "%1$-" + width + "s";
+        String[] star = {_ID, COUNTS_NAME, COUNTS_COUNT, COUNTS_POSITION};
+        for (String column : star) {
+            stringBuilder.append(String.format(Locale.US, formatString, column))
+                         .append('|');
+            line.append(new String(new char[width]).replace('\0', '-'))
+                .append('+');
+        }
+        stringBuilder.append('\n')
+                     .append(line.toString())
+                     .append('\n');
+        Cursor cursor = db.query(
+                TABLE_COUNTS,
+                star,
+                null, null, null, null,
+                COUNTS_POSITION + " DESC");
+        if (cursor.moveToFirst()) {
+            do {
+                for (String column : star) {
+                    stringBuilder.append(String.format(Locale.US, formatString,
+                                                       Trimmer.trim(cursor.getString(
+                                                               cursor.getColumnIndexOrThrow(
+                                                                       column)), width)))
+                                 .append('|');
+                }
+                stringBuilder.append('\n');
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return stringBuilder.toString();
+    }
+
     public void deleteCount(Count count) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
@@ -197,20 +262,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     _ID + " = ?",
                     new String[]{String.valueOf(count.getId())},
                     null, null, null);
+            int positionColumn = cursor.getColumnIndexOrThrow(COUNTS_POSITION);
+            if (cursor.moveToFirst()) {
+                int oldPosition = cursor.getInt(positionColumn);
+                cursor.close();
 
-            int oldPosition = cursor.getInt(cursor.getColumnIndex(COUNTS_POSITION));
-            cursor.close();
+                db.delete(
+                        TABLE_COUNTS,
+                        _ID + " = ?",
+                        new String[]{Long.toString(count.getId())});
+                --itemCount;
 
-            db.delete(
-                    TABLE_COUNTS,
-                    _ID + " = ?",
-                    new String[]{Long.toString(count.getId())});
-            --itemCount;
-
-            db.execSQL("UPDATE " + TABLE_COUNTS +
-                       " SET " + COUNTS_POSITION + " = " + COUNTS_POSITION + " - 1" +
-                       " WHERE " + COUNTS_POSITION + " > " + Integer.toString(oldPosition));
-            db.setTransactionSuccessful();
+                db.execSQL("UPDATE " + TABLE_COUNTS +
+                           " SET " + COUNTS_POSITION + " = " + COUNTS_POSITION + " - 1" +
+                           " WHERE " + COUNTS_POSITION + " > " + Integer.toString(oldPosition));
+                db.setTransactionSuccessful();
+            }
         } finally {
             db.endTransaction();
         }

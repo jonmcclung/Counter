@@ -15,11 +15,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.lerenard.counter3.database.DatabaseHandler;
-import com.lerenard.counter3.util.Consumer;
+import com.lerenard.counter3.helper.DatabaseHandler;
+import com.lerenard.counter3.helper.SimpleItemTouchHelperCallback;
 
 public class MainActivity extends AppCompatActivity
-        implements DataSetListener<Count>, ItemTouchHelperAdapter {
+        implements DataSetListener<Count> {
 
     static final int NEW_COUNT = 0,
             UPDATE_COUNT = 1;
@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "stopping");
-        databaseHandler.getCursor().close();
         databaseHandler.close();
     }
 
@@ -60,15 +59,20 @@ public class MainActivity extends AppCompatActivity
         });
 
         recyclerView = (RecyclerView) findViewById(R.id.list);
-        recyclerView.setLayoutManager(
-                new LinearLayoutManager(
-                        this,
-                        LinearLayoutManager.VERTICAL,
-                        true));
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(
+                this,
+                LinearLayoutManager.VERTICAL,
+                true);
+        layoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(layoutManager);
 
         databaseHandler = new DatabaseHandler(this);
         adapter = new CountRecyclerViewAdapter(this, databaseHandler.getAllCounts(), this);
         recyclerView.setAdapter(adapter);
+        new ItemTouchHelper(
+                new SimpleItemTouchHelperCallback(adapter))
+                .attachToRecyclerView(recyclerView);
     }
 
     @Override
@@ -125,18 +129,34 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAdd(final Count count) {
-        recyclerView.getLayoutManager().scrollToPosition(adapter.getItemCount() - 1);
+    public void onAdd(final Count count, final int index) {
+        recyclerView.getLayoutManager().scrollToPosition(index);
         new AsyncTask<Void, Void, Void>() {
             protected Void doInBackground(Void... params) {
-                databaseHandler.addCount(count);
+                if (index != adapter.getItemCount() - 1) {
+                    databaseHandler.addCount(count, index);
+                }
+                else {
+                    databaseHandler.addCount(count);
+                }
                 return null;
             }
         }.execute();
     }
 
     @Override
-    public void onDelete(final Count count) {
+    public void onDelete(final Count count, final int position) {
+        Snackbar.make(
+                findViewById(R.id.main_layout),
+                R.string.count_deleted,
+                Snackbar.LENGTH_LONG)
+                .setAction(R.string.undo_count_deleted, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        adapter.insert(position, count);
+                    }
+                }).show();
+
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -167,20 +187,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDrag(Count count, int start, int end) {
-
+        databaseHandler.moveCount(count.getId(), start, end);
     }
 
     @Override
     public void onLongPress(Count count, int position) {
-
-    }
-
-    @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-    }
-
-    @Override
-    public void onItemDismiss(int position) {
 
     }
 }

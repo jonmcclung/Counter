@@ -2,10 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent" android:layout_height="wrap_content"
     android:padding="10dp"
-    android:textSize="16sp"
+    android:textSize="@dimen/text_size"
     android:textStyle="bold"
     android:orientation="horizontal"
     android:weightSum="10"
+    android:clickable="true"
+    android:longClickable="true"
+    android:focusable="true"
+    android:background="?selectableItemBackground"
     >
     <TextView
         android:layout_width="0dp"

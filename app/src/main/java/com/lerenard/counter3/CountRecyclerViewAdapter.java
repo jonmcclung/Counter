@@ -1,16 +1,15 @@
 package com.lerenard.counter3;
 
 import android.content.Context;
-import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.lerenard.counter3.database.DatabaseHandler;
-import com.lerenard.counter3.util.Consumer;
+import com.lerenard.counter3.helper.ItemTouchHelperAdapter;
+import com.lerenard.counter3.helper.ItemTouchHelperViewHolder;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -29,9 +28,9 @@ public class CountRecyclerViewAdapter
     private ArrayList<Count> items;
 
     @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-        if (fromPosition == toPosition) {
-            return;
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        /*if (fromPosition == toPosition) {
+            return false;
         }
         Count moved = items.get(fromPosition);
         if (fromPosition > toPosition) {
@@ -44,8 +43,13 @@ public class CountRecyclerViewAdapter
                 items.set(i, items.get(i + 1));
             }
         }
+        items.set(toPosition, moved);*/
+        Count moved = items.get(fromPosition);
+        items.set(fromPosition, items.get(toPosition));
         items.set(toPosition, moved);
+        notifyItemMoved(fromPosition, toPosition);
         listener.onDrag(moved, fromPosition, toPosition);
+        return true;
     }
 
     @Override
@@ -56,13 +60,14 @@ public class CountRecyclerViewAdapter
     public void remove(int position) {
         Count removed = items.remove(position);
         notifyItemRemoved(position);
-        listener.onDelete(removed);
+        listener.onDelete(removed, position);
     }
 
     public void add(Count count) {
         items.add(count);
-        notifyItemInserted(items.size() - 1);
-        listener.onAdd(count);
+        int index = items.size() - 1;
+        notifyItemInserted(index);
+        listener.onAdd(count, index);
     }
 
     public void set(int index, Count count) {
@@ -71,7 +76,14 @@ public class CountRecyclerViewAdapter
         listener.onUpdate(count);
     }
 
-    public class CountViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public void insert(int index, Count count) {
+        items.add(index, count);
+        notifyItemInserted(index);
+        listener.onAdd(count, index);
+    }
+
+    public class CountViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, ItemTouchHelperViewHolder {
         private TextView name, amount;
         private Count count;
 
@@ -80,17 +92,6 @@ public class CountRecyclerViewAdapter
             name = (TextView) itemView.findViewById(R.id.count_name);
             amount = (TextView) itemView.findViewById(R.id.count_value);
             itemView.setOnClickListener(this);
-            /*itemView.setOnTouchListener(new OnSwipeListener(mContext) {
-                @Override
-                public void onSwipeRight() {
-                    Log.d(TAG, "swiping right on " + name.getText() + ", " + amount.getText());
-                }
-
-                @Override
-                public void onSwipeLeft() {
-                    Log.d(TAG, "swiping left on " + name.getText() + ", " + amount.getText());
-                }
-            });*/
         }
 
         @Override
@@ -102,6 +103,16 @@ public class CountRecyclerViewAdapter
             this.count = count;
             name.setText(count.getName());
             amount.setText(String.format(Locale.getDefault(), "%d", count.getCount()));
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(0);
         }
     }
 

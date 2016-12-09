@@ -1,6 +1,3 @@
-remove count by:
-    swiping
-    long-pressing
 option to undo after removing
 
 move counts around
