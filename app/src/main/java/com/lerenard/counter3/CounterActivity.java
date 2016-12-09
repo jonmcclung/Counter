@@ -2,6 +2,8 @@ package com.lerenard.counter3;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -13,6 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.lerenard.counter3.helper.DatabaseHandler;
 
 import java.util.Locale;
 
@@ -141,21 +145,24 @@ public class CounterActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop, alreadyAdded: " + alreadyAdded);
-        Log.d(TAG, MainActivity.getDatabase().toString());
-        Count count = getCount();
-        if (!alreadyAdded) {
-            MainActivity.getDatabase().addCount(count);
-            alreadyAdded = true;
-        }
-        else {
-            if (!count.equals(original)) {
-                Log.d(TAG, "updating since " + count.toString() + " != " + original.toString());
-                MainActivity.getDatabase().updateCount(count);
+        Log.d(TAG, "stopping");
+
+        final Count count = getCount();
+        final DatabaseHandler db = MainActivity.getDatabase();
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (!alreadyAdded) {
+                    db.addCount(count);
+                    alreadyAdded = true;
+                }
+                else if (!count.equals(original)) {
+                    db.updateCount(count);
+                }
+                return null;
             }
-        }
-        Log.d(TAG, "onStop, exiting");
-        Log.d(TAG, MainActivity.getDatabase().toString());
+        }.execute();
     }
 
     @Override

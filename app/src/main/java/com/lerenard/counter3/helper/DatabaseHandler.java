@@ -92,8 +92,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                        ". But they should differ by exactly one");
         }
 
-        Log.d(TAG, toString());
-
         ContentValues newValuesForTo = new ContentValues();
         newValuesForTo.put(COUNTS_POSITION, fromPosition);
 
@@ -117,12 +115,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     new String[]{String.valueOf(fromId)});
 
             db.setTransactionSuccessful();
-            Log.d(TAG, "successfully moved " + fromPosition + " to " + toPosition);
         } finally {
             db.endTransaction();
         }
         db.close();
-        Log.d(TAG, toString());
     }
 
     public void addCount(Count count, int position) {
