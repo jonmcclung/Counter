@@ -64,10 +64,7 @@ public class CountRecyclerViewAdapter
     }
 
     public void add(Count count) {
-        items.add(count);
-        int index = items.size() - 1;
-        notifyItemInserted(index);
-        listener.onAdd(count, index);
+        insert(items.size(), count);
     }
 
     public void set(int index, Count count) {
