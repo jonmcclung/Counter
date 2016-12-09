@@ -9,8 +9,7 @@
     android:longClickable="true"
     android:focusable="true"
     android:foreground="?selectableItemBackground"
-    android:background="@drawable/selectable_and_draggable_item"
-    >
+    android:background="@drawable/selectable_and_draggable_item">
     <TextView
         android:textSize="@dimen/list_text_size"
         android:layout_width="0dp"

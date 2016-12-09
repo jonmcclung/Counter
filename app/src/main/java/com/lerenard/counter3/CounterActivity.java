@@ -48,6 +48,14 @@ public class CounterActivity extends AppCompatActivity {
         return false;
     }
 
+    private void increment(int howMuch) {
+        countDisplayView.setText(String.format(
+                Locale.getDefault(),
+                "%d",
+                howMuch + Integer.parseInt(
+                        String.valueOf((countDisplayView).getText()))));
+    }
+
     private void revert() {
         setData(original);
     }
@@ -69,6 +77,8 @@ public class CounterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_counter);
         nameView = (EditText) findViewById(R.id.counter_title);
         countDisplayView = (TextView) findViewById(R.id.count_display);
+        TextView decrementView = (TextView) findViewById(R.id.decrement_image);
+        TextView incrementView = (TextView) findViewById(R.id.increment_image);
 
         Bundle extras = getIntent().getExtras();
         requestCode = extras.getInt(MainActivity.INTENT_EXTRA_REQUEST_CODE);
@@ -98,14 +108,19 @@ public class CounterActivity extends AppCompatActivity {
         assert original != null;
         Log.d(TAG, Long.toString(original.getId()));
 
-        countDisplayView.setOnClickListener(new View.OnClickListener() {
+        decrementView.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                ((TextView) v).setText(String.format(
-                        Locale.getDefault(),
-                        "%d",
-                        1 + Integer.parseInt(
-                                String.valueOf(((TextView) v).getText()))));
+                increment(-1);
+            }
+        });
+
+        incrementView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                increment(1);
             }
         });
 
