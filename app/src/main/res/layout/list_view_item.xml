@@ -8,14 +8,16 @@
     android:clickable="true"
     android:longClickable="true"
     android:focusable="true"
-    android:background="?selectableItemBackground"
+    android:foreground="?selectableItemBackground"
+    android:background="@drawable/selectable_and_draggable_item"
     >
     <TextView
         android:textSize="@dimen/list_text_size"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/count_name"
-        android:layout_weight="9"/>
+        android:layout_weight="9"
+        android:textColor="@color/textColorGray"/>
     <TextView
         android:textSize="@dimen/list_text_size"
         android:layout_width="0dp"

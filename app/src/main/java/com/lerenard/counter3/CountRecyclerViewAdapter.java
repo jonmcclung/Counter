@@ -2,6 +2,8 @@ package com.lerenard.counter3;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +28,7 @@ public class CountRecyclerViewAdapter
 
     private static String TAG = "CountRecyclerViewAdapter";
     private final DataSetListener<Count> listener;
+    private final Context context;
     private ArrayList<Count> items;
 
     @Override
@@ -111,12 +114,12 @@ public class CountRecyclerViewAdapter
 
         @Override
         public void onItemSelected() {
-            itemView.setBackgroundColor(Color.LTGRAY);
+            itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.highlightColor));
         }
 
         @Override
         public void onItemClear() {
-            itemView.setBackgroundColor(0);
+            itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.default_item_color));
         }
     }
 
@@ -124,6 +127,7 @@ public class CountRecyclerViewAdapter
             Context context,
             ArrayList<Count> items,
             DataSetListener<Count> listener) {
+        this.context = context;
         this.items = items;
         this.listener = listener;
     }

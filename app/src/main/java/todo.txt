@@ -1,5 +1,3 @@
-make recyclerview pop up with snackbar.
-
 select in bulk, select all, change color, remove
 
 change font size as setting
