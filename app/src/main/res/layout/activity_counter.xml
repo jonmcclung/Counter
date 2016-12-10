@@ -37,21 +37,19 @@
         android:layout_alignBottom="@id/count_display"
         android:orientation="horizontal"
         android:weightSum="2">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+        <ImageView
+            style="@style/incrementDecrement"
             android:id="@+id/decrement_image"
             android:contentDescription="@string/decrement_image_description"
-            android:background="@color/lightRed"
+            android:src="@drawable/ic_arrow_downward_black_48dp"
             />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+        <ImageView
+            style="@style/incrementDecrement"
             android:id="@+id/increment_image"
             android:contentDescription="@string/increment_image_description"
-            android:background="@color/lightGreen"/>
+            android:foreground="@color/incrementDecrementColor"
+            android:background="?selectableItemBackground"
+            android:src="@drawable/ic_arrow_upward_black_48dp"/>
     </LinearLayout>
     <Button
         android:layout_width="wrap_content"

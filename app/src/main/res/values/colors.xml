@@ -6,8 +6,10 @@
     <color name="red">#FF0000</color>
     <color name="default_item_color">#fcfcfc</color>
     <color name="highlightColor">#e6e6e6</color>
+    <color name="incrementDecrementColor">#acacac</color>
     <color name="textColorGray">#616161</color>
     <color name="lightRed">#30ff0000</color>
     <color name="lightGreen">#3000ff00</color>
+    <color name="green">#00ff00</color>
     <color name="transparent">#00000000</color>
 </resources>

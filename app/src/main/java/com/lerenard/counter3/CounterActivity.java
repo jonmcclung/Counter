@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lerenard.counter3.helper.DatabaseHandler;
@@ -77,8 +78,9 @@ public class CounterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_counter);
         nameView = (EditText) findViewById(R.id.counter_title);
         countDisplayView = (TextView) findViewById(R.id.count_display);
-        TextView decrementView = (TextView) findViewById(R.id.decrement_image);
-        TextView incrementView = (TextView) findViewById(R.id.increment_image);
+        ImageView decrementView = (ImageView) findViewById(R.id.decrement_image);
+        ImageView incrementView = (ImageView) findViewById(R.id.increment_image);
+        countDisplayView.bringToFront();
 
         Bundle extras = getIntent().getExtras();
         requestCode = extras.getInt(MainActivity.INTENT_EXTRA_REQUEST_CODE);
