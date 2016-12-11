@@ -8,5 +8,8 @@
     <dimen name="help_button_text_size">24sp</dimen>
     <dimen name="help_button_width">48dp</dimen>
     <dimen name="help_button_height">32dp</dimen>
-    <dimen name="count_size">72sp</dimen>
+    <dimen name="count_size">128sp</dimen>
+    <dimen name="count_by_text_size">24sp</dimen>
+    <dimen name="count_by_padding">8dp</dimen>
+    <dimen name="count_by_margin">4dp</dimen>
 </resources>
