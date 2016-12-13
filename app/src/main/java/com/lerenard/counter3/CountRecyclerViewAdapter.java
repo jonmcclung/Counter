@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.lerenard.counter3.helper.ItemTouchHelperAdapter;
 import com.lerenard.counter3.helper.ItemTouchHelperViewHolder;
+import com.lerenard.counter3.helper.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -119,7 +120,8 @@ public class CountRecyclerViewAdapter
 
         @Override
         public void onItemClear() {
-            itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.default_item_color));
+            itemView.setBackgroundColor(
+                    ContextCompat.getColor(context, R.color.default_item_color));
         }
     }
 

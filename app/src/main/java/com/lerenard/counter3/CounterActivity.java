@@ -161,11 +161,19 @@ public class CounterActivity extends AppCompatActivity {
             }
         });
 
-        final TextView resetButton = (TextView) findViewById(R.id.reset_button);
+        final Button resetButton = (Button) findViewById(R.id.reset_button);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 reset();
+            }
+        });
+
+        final Button saveButton = (Button) findViewById(R.id.save_button);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                save();
             }
         });
 
@@ -214,6 +222,10 @@ public class CounterActivity extends AppCompatActivity {
         String newCountBy = String.valueOf(countBy);
         countByView.setText(newCountBy);
         updateRadioButtons(newCountBy);
+    }
+
+    private void save() {
+        original = getCount();
     }
 
     private void updateRadioButtons(String newCountByString) {

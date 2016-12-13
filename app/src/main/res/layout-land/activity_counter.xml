@@ -42,6 +42,7 @@
         android:textSize="@dimen/count_size"
         app:minTextSize="@dimen/min_count_size"
         app:maxTextSize="@dimen/max_count_size"
+        android:maxLines="1"
         />
 
     <LinearLayout

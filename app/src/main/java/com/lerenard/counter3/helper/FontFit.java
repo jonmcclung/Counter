@@ -90,8 +90,6 @@ class FontFit {
 
     void onTextChanged(final CharSequence text) {
         refitText(text.toString(), textView.getWidth());
-        LiteralPrinter.log(TAG, text.toString());
-        Log.d(TAG, text.toString().length() + "");
     }
 
     void onSizeChanged(int w, int h, int oldw, int oldh) {

@@ -235,7 +235,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             do {
                 for (String column : star) {
                     stringBuilder.append(String.format(Locale.US, formatString,
-                                                       Trimmer.trim(cursor.getString(
+                                                       StringUtils.trim(cursor.getString(
                                                                cursor.getColumnIndexOrThrow(
                                                                        column)), width)))
                                  .append('|');
