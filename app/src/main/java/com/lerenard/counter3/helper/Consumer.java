@@ -1,4 +1,4 @@
-package com.lerenard.counter3.util;
+package com.lerenard.counter3.helper;
 
 /**
  * Created by mc on 02-Dec-16.
