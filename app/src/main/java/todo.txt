@@ -1,7 +1,5 @@
 select in bulk, select all, change color, remove
 
-change font size as setting
-
 change color of count
 
 option to log in
