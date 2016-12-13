@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="count_size">128sp</dimen>
+    <dimen name="min_count_size">24sp</dimen>
+    <dimen name="max_count_size">128sp</dimen>
+    <dimen name="counter_title_text_size">36sp</dimen>
+    <dimen name="counter_title_min_text_size">12sp</dimen>
+    <dimen name="counter_title_max_text_size">64sp</dimen>
+</resources>

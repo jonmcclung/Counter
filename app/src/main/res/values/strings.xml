@@ -87,4 +87,5 @@
     <string name="decrement_image_description">Decrement the count</string>
     <string name="count_by">Count by:</string>
     <string name="_1">1</string>
+    <string name="other">Other:</string>
 </resources>

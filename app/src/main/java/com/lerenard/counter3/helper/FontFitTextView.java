@@ -1,83 +1,60 @@
 package com.lerenard.counter3.helper;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.widget.TextView;
 
-/**
- * copied from http://stackoverflow.com/a/7875656/4714742
- */
+import com.lerenard.counter3.R;
 
 public class FontFitTextView extends TextView {
-
-    public FontFitTextView(Context context) {
-        super(context);
-        initialise();
-    }
+    protected final FontFit fontFit;
+    private final String TAG = "FontFitTextView";
 
     public FontFitTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialise();
-    }
-
-    private void initialise() {
-        mTestPaint = new Paint();
-        mTestPaint.set(this.getPaint());
-        //max size defaults to the initially specified text size unless it is too small
-    }
-
-    /* Re size the font so the specified text fits in the text box
-     * assuming the text box is the specified width.
-     */
-    private void refitText(String text, int textWidth) {
-        if (textWidth <= 0) {
-            return;
+        TypedArray typedArray = context.getTheme().obtainStyledAttributes(
+                attrs,
+                R.styleable.FontFit,
+                0, 0);
+        float minTextSize, maxTextSize;
+        try {
+            minTextSize = typedArray.getDimension(
+                    R.styleable.FontFit_minTextSize,
+                    FontFit.defaultMinTextSize);
+            maxTextSize = typedArray.getDimension(
+                    R.styleable.FontFit_maxTextSize,
+                    FontFit.defaultMaxTextSize);
+        } finally {
+            typedArray.recycle();
         }
-        int targetWidth = textWidth - this.getPaddingLeft() - this.getPaddingRight();
-        float hi = 1000;
-        float lo = 2;
-        final float threshold = 0.5f; // How close we have to be
-
-        mTestPaint.set(this.getPaint());
-
-        while ((hi - lo) > threshold) {
-            float size = (hi + lo) / 2;
-            mTestPaint.setTextSize(size);
-            if (mTestPaint.measureText(text) >= targetWidth) {
-                hi = size; // too big
-            }
-            else {
-                lo = size; // too small
-            }
-        }
-        // Use lo so that we undershoot rather than overshoot
-        this.setTextSize(TypedValue.COMPLEX_UNIT_PX, lo);
+        fontFit = new FontFit(this, minTextSize, maxTextSize);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int height = getMeasuredHeight();
-        refitText(this.getText().toString(), parentWidth);
-        this.setMeasuredDimension(parentWidth, height);
+        fontFit.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        setMeasuredDimension(fontFit.getWidthMeasureSpec(), fontFit.getHeightMeasureSpec());
     }
 
     @Override
-    protected void onTextChanged(final CharSequence text, final int start, final int before,
-                                 final int after) {
-        refitText(text.toString(), this.getWidth());
+    protected void onTextChanged(CharSequence text, int start, int lengthBefore,
+                                 int lengthAfter) {
+        if (fontFit == null) {
+            super.onTextChanged(text, start, lengthBefore, lengthAfter);
+        }
+        else {
+            fontFit.onTextChanged(text);
+        }
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        if (w != oldw) {
-            refitText(this.getText().toString(), w);
-        }
+        Log.d(TAG, "old size: (" + oldw + ", " + oldh + "), new size: (" + w + ", " + h + ")");
+        fontFit.onSizeChanged(w, h, oldw, oldh);
     }
-
-    //Attributes
-    private Paint mTestPaint;
 }

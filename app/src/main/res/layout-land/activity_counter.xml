@@ -13,32 +13,30 @@
     tools:context="com.lerenard.counter3.CounterActivity">
 
     <include
-        layout="@layout/count_name_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"/>
-
-    <include
         android:id="@+id/counter_buttons"
         layout="@layout/counter_activity_buttons"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/counter_title"/>
 
     <include
-        android:id="@+id/count_by_row"
         layout="@layout/count_by_buttons"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/counter_buttons"/>
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/counter_title"
+        android:layout_toEndOf="@id/counter_buttons"
+        android:layout_toRightOf="@id/counter_buttons"/>
 
     <com.lerenard.counter3.helper.FontFitTextView
         android:id="@+id/count_display"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/count_by_row"
-        android:background="@color/transparent"
+        android:layout_below="@id/counter_buttons"
         android:gravity="center"
         android:text="@string/starting_value"
         android:textSize="@dimen/count_size"
@@ -69,4 +67,12 @@
             android:foreground="@color/incrementDecrementColor"
             android:src="@drawable/ic_arrow_upward_black_48dp"/>
     </LinearLayout>
+
+    <include
+        layout="@layout/count_name_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"/>
 </RelativeLayout>

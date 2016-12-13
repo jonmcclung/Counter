@@ -1,11 +1,9 @@
 package com.lerenard.counter3;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.EditText;
 
 import com.lerenard.counter3.helper.FontFitEditText;
 
@@ -13,20 +11,18 @@ import com.lerenard.counter3.helper.FontFitEditText;
  * Created by mc on 11-Dec-16.
  */
 
-public class HideCursorEditText extends EditText {
+public class HideCursorEditText extends FontFitEditText {
+
+    private static final String TAG = "HideCursorEditText_TAG";
+
     private void init() {
+        setCursorVisible(false);
         setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setCursorVisible(true);
             }
         });
-    }
-
-
-    public HideCursorEditText(Context context) {
-        super(context);
-        init();
     }
 
     @Override
