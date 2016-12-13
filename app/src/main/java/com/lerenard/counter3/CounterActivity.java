@@ -41,7 +41,7 @@ public class CounterActivity extends AppCompatActivity {
             COUNT_BY_KEY = "COUNT_BY_KEY";
     private Count original;
     private int index, requestCode, countBy;
-    private EditText nameView;
+    private HideCursorEditText nameView;
     private TextView countDisplayView;
     private boolean alreadyAdded;
     private static int[] countByRadioOptions = {1, 2, 3, 5, 10};
@@ -54,7 +54,6 @@ public class CounterActivity extends AppCompatActivity {
 
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
-            Log.d(TAG, "checkedId: " + checkedId);
             if (checkedId != -1) {
                 String newCountBy = ((RadioButton) group.findViewById(checkedId)).getText().toString();
                 updateCountBy(Integer.parseInt(newCountBy));
@@ -108,7 +107,10 @@ public class CounterActivity extends AppCompatActivity {
         countBy = this.getPreferences(Context.MODE_PRIVATE).getInt(COUNT_BY_KEY, defaultCountBy);
 
         setContentView(R.layout.activity_counter);
-        nameView = (EditText) findViewById(R.id.counter_title);
+        nameView = (HideCursorEditText) findViewById(R.id.counter_title);
+        if (nameView == null) {
+            Log.d(TAG, "nameView is null ):");
+        }
         countDisplayView = (TextView) findViewById(R.id.count_display);
         ImageView decrementView = (ImageView) findViewById(R.id.decrement_image);
         ImageView incrementView = (ImageView) findViewById(R.id.increment_image);
@@ -177,7 +179,13 @@ public class CounterActivity extends AppCompatActivity {
 
         instantiateRadioGroup();
 
-        countByView.setText(String.valueOf(countBy));
+        countByView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((EditText) v).setCursorVisible(true);
+            }
+        });
+
         countByView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -185,15 +193,7 @@ public class CounterActivity extends AppCompatActivity {
                     try {
                         String newCountByString = v.getText().toString();
                         updateCountBy(Integer.parseInt(newCountByString));
-                        radioGroup.setOnCheckedChangeListener(null);
-                        radioGroup.clearCheck();
-                        for (RadioButton radioButton : radioGroupButtons) {
-                            if (radioButton.getText().equals(newCountByString)) {
-                                radioButton.setChecked(true);
-                                break;
-                            }
-                        }
-                        radioGroup.setOnCheckedChangeListener(radioGroupListener);
+                        updateRadioButtons(newCountByString);
                     } catch (NumberFormatException e) {
                         Snackbar.make(findViewById(R.id.count_layout),
                                       "Invalid number (too big or too small?)",
@@ -205,12 +205,27 @@ public class CounterActivity extends AppCompatActivity {
                     inputManager.hideSoftInputFromWindow(
                             getCurrentFocus().getWindowToken(),
                             InputMethodManager.HIDE_NOT_ALWAYS);
-
+                    v.setCursorVisible(false);
                     return true;
                 }
                 return false;
             }
         });
+        String newCountBy = String.valueOf(countBy);
+        countByView.setText(newCountBy);
+        updateRadioButtons(newCountBy);
+    }
+
+    private void updateRadioButtons(String newCountByString) {
+        radioGroup.setOnCheckedChangeListener(null);
+        radioGroup.clearCheck();
+        for (RadioButton radioButton : radioGroupButtons) {
+            if (radioButton.getText().equals(newCountByString)) {
+                radioButton.setChecked(true);
+                break;
+            }
+        }
+        radioGroup.setOnCheckedChangeListener(radioGroupListener);
     }
 
     private void updateCountBy(int newCountBy) {
@@ -225,13 +240,9 @@ public class CounterActivity extends AppCompatActivity {
         radioGroupButtons = new ArrayList<>(countByRadioOptions.length);
         radioGroup = (RadioGroup) findViewById(R.id.count_by_radio_group);
         for (final int countByOption : countByRadioOptions) {
-            RadioButton radioButton = (RadioButton) getLayoutInflater().inflate(R.layout.count_by_radio_button, null);
-//            RadioButton radioButton = new RadioButton(this);
+            RadioButton radioButton = (RadioButton) getLayoutInflater().inflate(R.layout.count_by_radio_button, radioGroup, false);
             radioGroupButtons.add(radioButton);
             radioButton.setText(String.valueOf(countByOption));
-            /*if (radioButton.getText().equals(String.valueOf(countBy))) {
-                radioButton.setChecked(true);
-            }*/
             radioGroup.addView(radioButton);
         }
         radioGroup.setOnCheckedChangeListener(radioGroupListener);
