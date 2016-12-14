@@ -85,6 +85,8 @@ public class MainActivity extends AppCompatActivity
         new ItemTouchHelper(
                 new SimpleItemTouchHelperCallback(adapter))
                 .attachToRecyclerView(recyclerView);
+
+
     }
 
     @Override

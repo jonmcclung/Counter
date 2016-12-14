@@ -33,4 +33,26 @@ public class FontFitTextView extends TextView {
         }
         fontFit = new FontFit(this, minTextSize, maxTextSize);
     }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        fontFit.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        setMeasuredDimension(fontFit.getWidthMeasureSpec(), fontFit.getHeightMeasureSpec());
+    }
+
+    @Override
+    protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
+        if (fontFit == null) {
+            super.onTextChanged(text, start, lengthBefore, lengthAfter);
+        }
+        else {
+            fontFit.onTextChanged(text);
+        }
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        fontFit.onSizeChanged(w, h, oldw, oldh);
+    }
 }

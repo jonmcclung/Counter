@@ -34,21 +34,6 @@ public class CountRecyclerViewAdapter
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        /*if (fromPosition == toPosition) {
-            return false;
-        }
-        Count moved = items.get(fromPosition);
-        if (fromPosition > toPosition) {
-            for (int i = fromPosition; i > toPosition; --i) {
-                items.set(i, items.get(i - 1));
-            }
-        }
-        else {
-            for (int i = fromPosition; i < toPosition; ++i) {
-                items.set(i, items.get(i + 1));
-            }
-        }
-        items.set(toPosition, moved);*/
         Count moved = items.get(fromPosition);
         items.set(fromPosition, items.get(toPosition));
         items.set(toPosition, moved);
@@ -74,7 +59,7 @@ public class CountRecyclerViewAdapter
         insert(items.size(), count, notify);
     }
 
-    public void set(int index, Count count, boolean notify) {
+    void set(int index, Count count, boolean notify) {
         items.set(index, count);
         notifyItemChanged(index);
         if (notify) {
@@ -82,7 +67,7 @@ public class CountRecyclerViewAdapter
         }
     }
 
-    public void insert(int index, Count count, boolean notify) {
+    void insert(int index, Count count, boolean notify) {
         items.add(index, count);
         notifyItemInserted(index);
         if (notify) {
@@ -90,12 +75,12 @@ public class CountRecyclerViewAdapter
         }
     }
 
-    public class CountViewHolder extends RecyclerView.ViewHolder
+    class CountViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener, ItemTouchHelperViewHolder {
         private TextView name, amount;
         private Count count;
 
-        public CountViewHolder(View itemView) {
+        CountViewHolder(View itemView) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.count_name);
             amount = (TextView) itemView.findViewById(R.id.count_value);
