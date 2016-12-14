@@ -5,7 +5,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:orientation="horizontal">
+    android:orientation="vertical"
+    android:id="@+id/counter_buttons">
 
     <Button
         android:id="@+id/reset_button"
@@ -18,7 +19,7 @@
 
     <Button
         android:id="@+id/save_button"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"

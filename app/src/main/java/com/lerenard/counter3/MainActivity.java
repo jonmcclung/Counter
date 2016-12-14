@@ -1,12 +1,18 @@
 package com.lerenard.counter3;
 
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -86,7 +92,11 @@ public class MainActivity extends AppCompatActivity
                 new SimpleItemTouchHelperCallback(adapter))
                 .attachToRecyclerView(recyclerView);
 
-
+        /*DividerItemDecoration divider = new DividerItemDecoration(
+                recyclerView.getContext(),
+                layoutManager.getOrientation());
+        divider.setDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.list_item_divider));
+        recyclerView.addItemDecoration(divider);*/
     }
 
     @Override

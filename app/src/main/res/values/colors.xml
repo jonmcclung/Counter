@@ -3,6 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorAccentDark">#b42959</color>
     <color name="red">#FF0000</color>
     <color name="default_item_color">#fcfcfc</color>
     <color name="highlightColor">#e6e6e6</color>
@@ -12,4 +13,5 @@
     <color name="lightGreen">#3000ff00</color>
     <color name="green">#00ff00</color>
     <color name="transparent">#00000000</color>
+    <color name="background">#eaeaea</color>
 </resources>

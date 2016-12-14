@@ -26,14 +26,17 @@
     </style>
 
     <style name="count_by_radio_button_style">
-        <item name="android:layout_width">@dimen/count_by_radius</item>
-        <item name="android:layout_height">@dimen/count_by_radius</item>
+        <item name="android:layout_width">@dimen/count_by_radio_button_radius</item>
+        <item name="android:layout_height">@dimen/count_by_radio_button_radius</item>
         <item name="android:background">@drawable/count_by_radio_button</item>
         <item name="android:button">@android:color/transparent</item>
         <item name="android:textSize">@dimen/count_by_text_size</item>
         <item name="android:gravity">center</item>
-        <item name="android:layout_marginRight">@dimen/count_by_margin</item>
-        <item name="android:layout_marginLeft">@dimen/count_by_margin</item>
+        <item name="android:layout_marginRight">@dimen/count_by_radio_button_margin</item>
+        <item name="android:layout_marginLeft">@dimen/count_by_radio_button_margin</item>
+        <item name="android:paddingLeft">@dimen/count_by_radio_button_padding</item>
+        <item name="android:paddingRight">@dimen/count_by_radio_button_padding</item>
+        <item name="android:elevation">@dimen/count_by_radio_button_elevation</item>
     </style>
 
 </resources>

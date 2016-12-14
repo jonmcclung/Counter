@@ -20,7 +20,7 @@ import java.util.Locale;
 
 /**
  * The adapter has an internal copy of the data. When something happens,
- * it notifies the DataSetListener about it so that it can react appropriately. It is
+ * it notifies the DataSetListener about it so that it can react appropriately. It also
  * allows dragging items around and swiping to delete.
  */
 public class CountRecyclerViewAdapter

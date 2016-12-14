@@ -56,8 +56,9 @@ class FontFit {
         if (textWidth <= 0) {
             return;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            Log.d(TAG, "maxLines: " + textView.getMaxLines());
+        if (StringUtils.indexOf(text, '\n', textView.getMaxLines()) != -1) {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, minTextSize);
+            return;
         }
         int targetWidth = textWidth - textView.getPaddingLeft() - textView.getPaddingRight();
         float hi = maxTextSize;

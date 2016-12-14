@@ -5,17 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <view
+    <com.lerenard.counter3.HideCursorEditText
         android:id="@+id/counter_title"
-        class="com.lerenard.counter3.HideCursorEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/enter_name"
         android:imeOptions="actionDone"
         android:inputType="textAutoCorrect|textMultiLine"
         android:maxLines="3"
+        android:layout_alignParentTop="true"
         android:textSize="@dimen/counter_title_text_size"
         app:minTextSize="@dimen/counter_title_min_text_size"
-        app:maxTextSize="@dimen/counter_title_max_text_size"
-        />
+        app:maxTextSize="@dimen/counter_title_max_text_size"/>
 </merge>

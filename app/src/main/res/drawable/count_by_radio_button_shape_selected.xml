@@ -2,8 +2,8 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <size
-        android:width="@dimen/count_by_radius"
-        android:height="@dimen/count_by_radius"/>
+        android:width="@dimen/count_by_radio_button_radius"
+        android:height="@dimen/count_by_radio_button_radius"/>
     <solid
         android:color="@color/colorAccent"/>
 

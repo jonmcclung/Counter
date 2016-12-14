@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto"
+       android:layout_width="match_parent"
+       android:layout_height="0dp">
+
+    <com.lerenard.counter3.helper.FontFitTextView
+        android:id="@+id/count_display"
+        app:maxTextSize="@dimen/max_count_size"
+        app:minTextSize="@dimen/min_count_size"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/count_by_row"
+        android:background="@color/transparent"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="@string/starting_value"
+        android:textSize="@dimen/count_size"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignBottom="@id/count_display"
+        android:layout_alignTop="@id/count_display"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <ImageView
+            android:id="@+id/decrement_image"
+            style="@style/incrementDecrement"
+            android:contentDescription="@string/decrement_image_description"
+            android:src="@drawable/ic_arrow_downward_black_48dp"
+            android:layout_weight="1"
+            />
+
+        <ImageView
+            android:id="@+id/increment_image"
+            style="@style/incrementDecrement"
+            android:background="?selectableItemBackground"
+            android:contentDescription="@string/increment_image_description"
+            android:foreground="@color/incrementDecrementColor"
+            android:src="@drawable/ic_arrow_upward_black_48dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+</merge>
