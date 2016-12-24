@@ -18,6 +18,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 
 import com.lerenard.counter3.helper.DatabaseHandler;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -53,7 +55,7 @@ public class CounterActivity extends AppCompatActivity {
     private static int[] countByRadioOptions = {1, 2, 3, 5, 10};
 
     private static int defaultCountBy = 1;
-    private EditText countByView;
+    private HideCursorEditText countByView;
     private RadioGroup radioGroup;
     private List<RadioButton> radioGroupButtons;
     private RadioGroup.OnCheckedChangeListener radioGroupListener =
@@ -114,7 +116,7 @@ public class CounterActivity extends AppCompatActivity {
             Log.d(TAG, "line width: " + layout.getLineWidth(0));
             Log.d(TAG, "view width: " + (textView.getWidth() - textView.getPaddingLeft() -
                                          textView.getPaddingRight()));
-            return layout.getLineWidth(0) -
+            return Math.max(layout.getLineWidth(0), textView.getMinWidth()) -
                    (textView.getWidth() - textView.getPaddingLeft() - textView.getPaddingRight());
         }
         return 0;
@@ -134,7 +136,7 @@ public class CounterActivity extends AppCompatActivity {
         countDisplayView = (TextView) findViewById(R.id.count_display);
         ImageView decrementView = (ImageView) findViewById(R.id.decrement_image);
         ImageView incrementView = (ImageView) findViewById(R.id.increment_image);
-        countByView = (EditText) findViewById(R.id.count_by_amount);
+        countByView = (HideCursorEditText) findViewById(R.id.count_by_amount);
         countDisplayView.bringToFront();
 
         Bundle extras = getIntent().getExtras();
@@ -213,6 +215,22 @@ public class CounterActivity extends AppCompatActivity {
             }
         });
 
+        countByView.setOnKeyPreImeListener(new OnKeyPreImeListener() {
+            @Override
+            public boolean onKeyPreIme(int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+                    String newCountBy = countByView.getText().toString();
+                    if (newCountBy.equals("")) {
+                        newCountBy = String.format(Locale.getDefault(), "%d", 1);
+                        countByView.setText(newCountBy);
+                    }
+                    updateCountBy(Integer.parseInt(newCountBy));
+                    updateRadioButtons(newCountBy);
+                }
+                return false;
+            }
+        });
+
         countByView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -254,6 +272,8 @@ public class CounterActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                Log.d(TAG, "minimum width: " + countByView.getMinWidth());
+                Log.d(TAG, "space needed: " + spaceNeeded(countByView));
                 float spaceNeeded_ = spaceNeeded(countByView);
                 if (spaceNeeded_ != 0) {
                     spaceNeeded_ = shiftRadioButtons(spaceNeeded_);
@@ -269,9 +289,22 @@ public class CounterActivity extends AppCompatActivity {
         Log.d(TAG, "");
         String newCountBy = String.valueOf(countBy);
         countByView.setText(newCountBy);
-        watcher.afterTextChanged(countByView.getEditableText());
+//        watcher.afterTextChanged(countByView.getEditableText()); // doesn't seem to have an effect
         updateRadioButtons(newCountBy);
+        final ViewTreeObserver countByTreeObserver = countByView.getViewTreeObserver();
+        countByTreeObserver.addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    private boolean flag = false;
+                    @Override
+                    public void onGlobalLayout() {
+                        if (!flag) {
+                            shiftRadioButtons(spaceNeeded(countByView));
+                        }
+                        flag = true;
+                    }
+                });
     }
+
 
     private int shiftRadioButtons(float spaceNeeded) {
         LinearLayout.LayoutParams oldParams =
@@ -279,6 +312,10 @@ public class CounterActivity extends AppCompatActivity {
         final int oldMargin = oldParams.rightMargin;
         int margin = (int) (Math.floor(-spaceNeeded / (radioGroupButtons.size() * 2))) +
                      oldMargin;
+        Log.d(
+                TAG,
+                "spaceNeeded: " + spaceNeeded + ", old margin: " + oldMargin + ", new margin: " +
+                margin);
         int spaceStillNeeded = 0;
         if (margin < 0) {
             spaceStillNeeded = -margin;

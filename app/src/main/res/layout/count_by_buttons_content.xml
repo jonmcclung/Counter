@@ -36,13 +36,16 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:layout_marginRight="@dimen/count_by_amount_right_margin"
+            android:layout_marginEnd="@dimen/count_by_amount_right_margin"
             android:hint="@string/other"
             android:imeOptions="actionDone"
             android:inputType="number"
             android:maxLines="1"
             android:textSize="@dimen/custom_count_by_text_size"
             app:maxTextSize="@dimen/count_by_text_size"
-            app:minTextSize="@dimen/count_by_text_size"/>
+            app:minTextSize="@dimen/count_by_text_size"
+            android:minWidth="@dimen/count_by_amount_min_width"/>
     </LinearLayout>
 
 </LinearLayout>

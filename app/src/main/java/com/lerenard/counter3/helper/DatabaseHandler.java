@@ -43,7 +43,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_COUNTS + "("
             + _ID + " INTEGER PRIMARY KEY,"
             + COUNTS_NAME + " TEXT,"
-            + COUNTS_COUNT + " INTEGER)";
+            + COUNTS_COUNT + " INTEGER,"
+            + COUNTS_POSITION + " INTEGER DEFAULT -1)";
 
     @Override
     public void onCreate(SQLiteDatabase db) {

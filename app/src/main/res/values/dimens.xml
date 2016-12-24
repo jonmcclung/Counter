@@ -27,4 +27,6 @@
     <dimen name="count_by_radio_button_padding">0dp</dimen>
     <dimen name="count_by_radio_button_elevation">2dp</dimen>
     <dimen name="count_by_radio_button_stroke_width">.001dp</dimen>
+    <dimen name="count_by_amount_min_width">64dp</dimen>
+    <dimen name="count_by_amount_right_margin">8dp</dimen>
 </resources>

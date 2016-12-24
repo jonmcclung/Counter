@@ -2,6 +2,7 @@ package com.lerenard.counter3;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -12,6 +13,15 @@ import com.lerenard.counter3.helper.FontFitEditText;
  */
 
 public class HideCursorEditText extends FontFitEditText {
+    private OnKeyPreImeListener onKeyPreImeListener;
+
+    public OnKeyPreImeListener getOnKeyPreImeListener() {
+        return onKeyPreImeListener;
+    }
+
+    public void setOnKeyPreImeListener(OnKeyPreImeListener onKeyPreImeListener) {
+        this.onKeyPreImeListener = onKeyPreImeListener;
+    }
 
     private static final String TAG = "HideCursorEditText_TAG";
 
@@ -30,13 +40,25 @@ public class HideCursorEditText extends FontFitEditText {
         if (keyCode == KeyEvent.KEYCODE_BACK &&
             event.getAction() == KeyEvent.ACTION_UP) {
             setCursorVisible(false);
-            return false;
         }
-        return super.dispatchKeyEvent(event);
+        if (onKeyPreImeListener != null) {
+            return onKeyPreImeListener.onKeyPreIme(keyCode, event);
+        }
+        else {
+            return super.dispatchKeyEvent(event);
+        }
     }
 
-    public HideCursorEditText(Context context, AttributeSet attrs) {
+    public HideCursorEditText(
+            Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+        init();
+    }
+
+    public HideCursorEditText(
+            Context context, AttributeSet attrs, OnKeyPreImeListener onKeyPreImeListener) {
         super(context, attrs);
+        this.onKeyPreImeListener = onKeyPreImeListener;
         init();
     }
 }
