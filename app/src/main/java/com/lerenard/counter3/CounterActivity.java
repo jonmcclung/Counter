@@ -425,8 +425,6 @@ public class CounterActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "onBackPressed");
-        Log.d(TAG, MainActivity.getDatabase().toString());
         Intent data = new Intent();
         data.putExtra(MainActivity.INTENT_EXTRA_COUNT, getCount());
         if (index != -1) {

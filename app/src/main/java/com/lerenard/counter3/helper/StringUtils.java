@@ -29,8 +29,10 @@ public class StringUtils {
      */
     public static int indexOf(String text, char c, int ordinal) {
         int res = -1;
-        while (ordinal-- > 0) {
-            res = text.indexOf(c, res);
+        if (ordinal > 0) {
+            do {
+                res = text.indexOf(c, res);
+            } while (--ordinal > 0 && res != -1);
         }
         return res;
     }
